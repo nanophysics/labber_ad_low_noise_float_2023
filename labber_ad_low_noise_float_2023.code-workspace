@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"python.defaultInterpreterPath": "C:\\Users\\maerki\\AppData\\Local\\Programs\\Python\\Python37\\python.exe",
+		"python.analysis.extraPaths": [],
+	}
+}
