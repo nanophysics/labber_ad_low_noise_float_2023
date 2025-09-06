@@ -2,8 +2,8 @@
 Based on
 C:\Program Files\Labber\Drivers\Examples\SimpleSignalGenerator
 """
-import InstrumentDriver
 import numpy as np
+import InstrumentDriver
 
 class Driver(InstrumentDriver.InstrumentWorker):
     """ This class implements a simple signal generator driver"""

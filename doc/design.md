@@ -38,25 +38,25 @@ It may produces signals with given timings to provoke verious reading situations
 A scenario is a sequence of output states hard coded in the pico.
 For example:
 
-Scanario 0 `prepare disable high`
+Scenario 0 `prepare disable high`
 ```python
 IN_disable(1)
 IN_t(0)
 IN_P(IN_P_0V7)
 ```
 
-Scanario 1 `silence`
+Scenario 1 `silence`
 ```python
 ```
 
-Scanario 2 `prepare disable low`
+Scenario 2 `prepare disable low`
 ```python
 IN_disable(0)
 IN_t(0)
 IN_P(IN_P_0V7)
 ```
 
-Scanario run 3 `trigger`
+Scenario run 3 `trigger`
 
 ```python
 IN_t(1)

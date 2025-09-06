@@ -5,8 +5,8 @@ import logging
 import InstrumentDriver  # pylint: disable=import-error
 import numpy as np
 
-import ad_low_noise_float_2023_utils
-import ad_low_noise_float_2023_thread
+import ad_utils
+import ad_thread
 
 logger = logging.getLogger("LabberDriver")
 
@@ -28,7 +28,7 @@ class Driver(InstrumentDriver.InstrumentWorker):
         self.dt:float = 1.0
         # self._thread: AMI430_thread.VisaThread = None
         # self._ramping_required = True
-        self.dict_channels = {ch.label:ch for ch in ad_low_noise_float_2023_utils.CHANNELS}
+        self.dict_channels = {ch.label:ch for ch in ad_utils.CHANNELS}
 
     def performOpen(self, options={}):
         """Perform the operation of opening the instrument connection"""
@@ -119,12 +119,15 @@ class Driver(InstrumentDriver.InstrumentWorker):
     def getTraces(self):
         """Resample the data"""
 
-        sample_count = int(self.getValue('Number of samples'))
+        duration_max_s = float(self.getValue('duration max s'))
+        sample_rate_sps_text = self.getValue('Sample rate SPS')
+        sample_rate_sps = 97656 # TODO
+        sample_count = int(duration_max_s * sample_rate_sps)
 
         for idx, channel in enumerate(self.dict_channels.values()):
-            channel.data = np.array([1.0*idx + i*0.1 for i in range(sample_count)])
+            channel.data = np.array([1.0*idx + i*0.001 for i in range(sample_count)])
 
-        self.dt = 1.0 / self.getValue('Sample rate')
+        self.dt = 1.0 / sample_rate_sps
 
         # data = self.mAI.readAll()
         # # put data in list of channels
