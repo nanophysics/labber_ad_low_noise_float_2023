@@ -7,6 +7,7 @@ import numpy as np
 
 import ad_utils
 import ad_thread
+import logging_utils
 
 logger = logging.getLogger("LabberDriver")
 
@@ -25,10 +26,10 @@ class Driver(InstrumentDriver.InstrumentWorker):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.dt:float = 1.0
+        self.dt: float = 1.0
         # self._thread: AMI430_thread.VisaThread = None
         # self._ramping_required = True
-        self.dict_channels = {ch.label:ch for ch in ad_utils.CHANNELS}
+        self.dict_channels = {ch.label: ch for ch in ad_utils.CHANNELS}
 
     def performOpen(self, options={}):
         """Perform the operation of opening the instrument connection"""
@@ -54,6 +55,9 @@ class Driver(InstrumentDriver.InstrumentWorker):
         """Perform the Set Value instrument operation. This function should
         return the actual value set by the instrument"""
         # keep track of multiple calls, to set multiple voltages efficiently
+
+        logging_utils.performSetValue(quant)
+
         if self.isFirstCall(options):
             logger.info(f"********** FIRST CALL '{quant.name}' {value}: {options}")
 
@@ -112,20 +116,22 @@ class Driver(InstrumentDriver.InstrumentWorker):
 
             # return correct data
             return quant.getTraceDict(channel.data, dt=self.dt)
-        
+
         # just return the quantity value
         return quant.getValue()
 
     def getTraces(self):
         """Resample the data"""
 
-        duration_max_s = float(self.getValue('duration max s'))
-        sample_rate_sps_text = self.getValue('Sample rate SPS')
-        sample_rate_sps = 97656 # TODO
+        duration_max_s = float(self.getValue("duration max s"))
+        sample_rate_sps_text = self.getValue("Sample rate SPS")
+        sample_rate_sps = 97656  # TODO
         sample_count = int(duration_max_s * sample_rate_sps)
 
         for idx, channel in enumerate(self.dict_channels.values()):
-            channel.data = np.array([1.0*idx + i*0.001 for i in range(sample_count)])
+            channel.data = np.array(
+                [1.0 * idx + i * 0.001 for i in range(sample_count)]
+            )
 
         self.dt = 1.0 / sample_rate_sps
 

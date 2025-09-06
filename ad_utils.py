@@ -1,6 +1,6 @@
-import numpy as np
-import enum
 import dataclasses
+import numpy as np
+
 
 @dataclasses.dataclass()
 class Channel:
@@ -10,14 +10,10 @@ class Channel:
     def reset(self) -> None:
         self.data.clear()
 
+
 CHANNELS = [
     Channel("IN_t"),
     Channel("IN_disable"),
     Channel("IN_P"),
     Channel("IN_N"),
 ]
-
-class Quantities(enum.Enum):
-    A = 'a'
-    B = 'v'
-

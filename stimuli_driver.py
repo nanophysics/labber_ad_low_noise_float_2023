@@ -2,6 +2,7 @@
 Based on
 C:\Program Files\Labber\Drivers\Examples\SimpleSignalGenerator
 """
+
 import sys
 import logging
 import numpy as np
@@ -9,16 +10,19 @@ import numpy as np
 import InstrumentDriver
 
 import stimuli_utils
+import logging_utils
 
-logger = logging.getLogger('LabberDriver')
+logger = logging.getLogger("LabberDriver")
 
 logging.basicConfig()
 logger.setLevel(logging.DEBUG)
 
 print(sys.version_info)
 
+
 class Driver(InstrumentDriver.InstrumentWorker):
-    """ This class implements a simple signal generator driver"""
+    """This class implements a simple signal generator driver"""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -28,23 +32,14 @@ class Driver(InstrumentDriver.InstrumentWorker):
     def performOpen(self, options={}):
         """Perform the operation of opening the instrument connection"""
 
-        dOptionCfg = self.dInstrCfg['options']
-        logger.info(f"A")
-        logger.info(f"{dOptionCfg}")
-        logger.info(f"B")
-        # for validId, validName in zip(dOptionCfg['model_id'],
-        #                               dOptionCfg['model_str']):
-
         if self.pico is None:
             self.pico = stimuli_utils.PicoStimuli()
-
 
     def performClose(self, bError=False, options={}):
         """Perform the close instrument connection operation"""
         if self.pico is not None:
             self.pico.close()
             self.pico = None
-
 
     def performSetValue(self, quant, value, sweepRate=0.0, options={}):
         """Perform the Set Value instrument operation. This function should
@@ -53,15 +48,16 @@ class Driver(InstrumentDriver.InstrumentWorker):
 
         logger.info(f"performSetValue({quant}, {value})")
 
+        logging_utils.performSetValue(quant)
+
         if quant.name == "Synchron":
             synchron_text = quant.getValueString()
-            self.is_asynchron = synchron_text == "ASYNCHRON" 
+            self.is_asynchron = synchron_text == "ASYNCHRON"
 
         if quant.name == "Scenario":
             self.pico.run_scenario(round(value), is_asynchron=self.is_asynchron)
 
         return value
-
 
     def performGetValue(self, quant, options={}):
         """Perform the Get Value instrument operation"""
@@ -83,9 +79,7 @@ class Driver(InstrumentDriver.InstrumentWorker):
         #     trace = quant.getTraceDict(signal, t0=0.0, dt=time[1]-time[0])
         #     # finally, return the trace object
         #     return trace
-        # else: 
+        # else:
         #     # for other quantities, just return current value of control
         #     return quant.getValue()
         quant.getValue()
-
-
