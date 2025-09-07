@@ -1,7 +1,12 @@
 {
 	"folders": [
 		{
+			"name": "labber",
 			"path": "."
+		},
+		{
+			"name": "ad_low_noise_float_2023_git",
+			"path": "../gits/ad_low_noise_float_2023_git"
 		}
 	],
 	"settings": {

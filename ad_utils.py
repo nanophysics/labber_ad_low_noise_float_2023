@@ -1,6 +1,8 @@
 import dataclasses
 import numpy as np
 
+class DriverAbortException(Exception):
+    pass
 
 @dataclasses.dataclass()
 class Channel:

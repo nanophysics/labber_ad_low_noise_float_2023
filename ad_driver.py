@@ -26,10 +26,12 @@ class Driver(InstrumentDriver.InstrumentWorker):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._thread: ad_thread.VisaThread | None = None
         self.dt: float = 1.0
         # self._thread: AMI430_thread.VisaThread = None
         # self._ramping_required = True
         self.dict_channels = {ch.label: ch for ch in ad_utils.CHANNELS}
+        self._thread = ad_thread.VisaThread()
 
     def performOpen(self, options={}):
         """Perform the operation of opening the instrument connection"""
@@ -49,7 +51,7 @@ class Driver(InstrumentDriver.InstrumentWorker):
 
     def performClose(self, bError=False, options={}):
         """Perform the close instrument connection operation"""
-        # self._thread.stop()
+        self._thread.stop()
 
     def performSetValue(self, quant, value, sweepRate=0.0, options={}):
         """Perform the Set Value instrument operation. This function should
