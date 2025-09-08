@@ -1,8 +1,10 @@
 import dataclasses
 import numpy as np
 
+
 class DriverAbortException(Exception):
     pass
+
 
 @dataclasses.dataclass()
 class Channel:
@@ -13,9 +15,11 @@ class Channel:
         self.data.clear()
 
 
+CHANNEL_T = Channel("IN_t")
+CHANNEL_DISABLE = Channel("IN_disable")
+CHANNEL_VOLTAGE = Channel("IN_voltage")
 CHANNELS = [
-    Channel("IN_t"),
-    Channel("IN_disable"),
-    Channel("IN_P"),
-    Channel("IN_N"),
+    CHANNEL_T,
+    CHANNEL_DISABLE,
+    CHANNEL_VOLTAGE,
 ]

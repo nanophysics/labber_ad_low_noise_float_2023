@@ -18,6 +18,14 @@
             "program": "ad_thread.py",
             "console": "integratedTerminal",
             "justMyCode": false
+        },
+        {
+            "name": "stimuli_validate_all_scenarios",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "stimuli_validate_all_scenarios.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
         }
     ]
 }

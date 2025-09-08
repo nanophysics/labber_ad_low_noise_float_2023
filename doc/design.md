@@ -1,5 +1,9 @@
 # Design
 
+Schematics `pcb_ad_low_noise_float_2023.pdf`:
+* J45 - IN_disable
+* J46 - IN_t 
+
 ## Testing with pico board
 
 The triggering may be tested using a pico board.
@@ -23,7 +27,7 @@ It may produces signals with given timings to provoke verious reading situations
   
   bool
 
-* IN_P
+* IN_voltage
   
   float (IN_P_0V, IN_P_0V7, IN_P_3V3)
 
@@ -37,6 +41,8 @@ It may produces signals with given timings to provoke verious reading situations
 
 A scenario is a sequence of output states hard coded in the pico.
 For example:
+
+TODO: Fix calls to new syntax
 
 Scenario 0 `prepare disable high`
 ```python
@@ -65,3 +71,13 @@ wait_ms(50)
 IN_t(0)
 IN_P(IN_P_0V0)
 ```
+
+## Run scenarios from the command line
+
+```bash
+cd stimuli_src_micropython
+uvx mpremote run init.py
+uvx mpremote resume run scenario_07.py exec 'run_scenario()'
+```
+
+There is no feedback on the terminal.

@@ -1,27 +1,38 @@
 from __future__ import annotations
 import time
+import enum
 import logging
 import threading
-import typing
-import enum
-import re
 import dataclasses
-import serial
-import serial.tools.list_ports
-
-import ad_low_noise_float_2023_decoder
-from constants_ad_low_noise_float_2023 import     RegisterFilter1,    RegisterMux
-
+import typing
 
 import numpy as np
 
-import ad_utils
+from ad_low_noise_float_2023.ad import (
+    AdLowNoiseFloat2023,
+    LOGGER_NAME,
+    MeasurementSequence,
+)
+from ad_low_noise_float_2023.constants import PcbParams, RegisterFilter1
+from ad_utils import CHANNEL_VOLTAGE, CHANNEL_T, CHANNEL_DISABLE
 
-TICK_INTERVAL_S = 0.5
+ADD_PRE_POST_SAMPLE = True
+"""
+Add a sample before the falling edge and a sample after the raising edge.
+If not set, IN_disable looks very boring... (all samples are 0)
+"""
+
+TODO_REMOVE = False
 
 logger = logging.getLogger("LabberDriver")
+logger_ad = logging.getLogger(LOGGER_NAME)
 
 LOCK = threading.Lock()
+
+
+class State(enum.IntEnum):
+    ARMED = enum.auto()
+    CAPTURING = enum.auto()
 
 
 def synchronized(func):
@@ -36,7 +47,234 @@ def synchronized(func):
     return wrapper
 
 
-class UsbThread(threading.Thread):
+@dataclasses.dataclass
+class Capturer:
+    IN_voltage: list[np.array]
+    IN_disable: list[np.array]
+    IN_t: list[np.array]
+
+    def append(self, measurements: MeasurementSequence) -> None:
+        self.IN_voltage = np.concatenate((self.IN_voltage, measurements.adc_value_V))
+        self.IN_disable = np.concatenate((self.IN_disable, measurements.IN_disable))
+        self.IN_t = np.concatenate((self.IN_t, measurements.IN_t))
+
+    def stop(self, measurements: MeasurementSequence, idx0_end: int) -> None:
+        self.IN_voltage = np.concatenate(
+            (self.IN_voltage, measurements.adc_value_V[:idx0_end])
+        )
+        self.IN_disable = np.concatenate(
+            (self.IN_disable, measurements.IN_disable[:idx0_end])
+        )
+        self.IN_t = np.concatenate((self.IN_t, measurements.IN_t[:idx0_end]))
+
+        assert len(self.IN_voltage) == len(self.IN_disable)
+        assert len(self.IN_voltage) == len(self.IN_t)
+
+    @staticmethod
+    def find_first0(array_of_bool: np.ndarray) -> typing.Optional[int]:
+        return Capturer.find_first(array_of_bool=array_of_bool, value_to_find=0)
+
+    @staticmethod
+    def find_first1(array_of_bool: np.ndarray) -> typing.Optional[int]:
+        return Capturer.find_first(array_of_bool=array_of_bool, value_to_find=1)
+
+    @staticmethod
+    def find_first(
+        array_of_bool: np.ndarray, value_to_find: int,
+    ) -> typing.Optional[int]:
+        """
+        Returns the index of the first '0'.
+        Returns None if no '0' found.
+
+        import numpy as np
+        >>> high_low_high = np.array([1, 1, 0, 0, 1], bool)
+        >>> low = np.nonzero(high_low_high == 0)[0]
+        >>> low
+        array([2, 3])
+        >>> low[0]
+        2
+        """
+        if TODO_REMOVE:
+            logger.info(
+                f"TOBE REMOVE find_first({len(array_of_bool)} value_to_find={value_to_find})"
+            )
+        if len(array_of_bool) == 0:
+            if TODO_REMOVE:
+                logger.info(
+                    f"TOBE REMOVE find_first({len(array_of_bool)}) value_to_find={value_to_find}) A"
+                )
+            return None
+
+        # Find first '0'
+        array_nonzero = np.nonzero(array_of_bool == value_to_find)[0]
+        if len(array_nonzero) == 0:
+            if TODO_REMOVE:
+                logger.info(
+                    f"TOBE REMOVE find_first({len(array_of_bool)}) value_to_find={value_to_find}) B"
+                )
+            return None
+
+        idx0_first = int(array_nonzero[0])
+        if TODO_REMOVE:
+            logger.info(
+                f"TOBE REMOVE find_first({len(array_of_bool)}) value_to_find={value_to_find}) C idx0_first0={idx0_first}"
+            )
+        return idx0_first
+
+    def limit_begin(self, idx0: int) -> None:
+        self.IN_disable = self.IN_disable[idx0:]
+        self.IN_t = self.IN_t[idx0:]
+        self.IN_voltage = self.IN_voltage[idx0:]
+
+    def limit_end(self, idx0: int) -> None:
+        self.IN_disable = self.IN_disable[:idx0]
+        self.IN_t = self.IN_t[:idx0]
+        self.IN_voltage = self.IN_voltage[:idx0]
+
+
+@dataclasses.dataclass
+class Acquistion:
+    state: State = State.ARMED
+    capturer: typing.Optional[Capturer] = None
+    time_armed_start_s: float = time.monotonic()
+    done_event = threading.Event()
+    lock = threading.Lock()
+    _sps: float = 1.0
+    out_timeout: bool = False
+    out_falling: bool = False
+    out_raising: bool = False
+    out_falling_s: float = 0.0
+    out_enabled_s: float = 0.0
+    _duration_max_s = 4.2
+    _duration_max_sample = 42
+
+    def set_SPS(self, register_filter1: RegisterFilter1) -> None:
+        assert isinstance(register_filter1, RegisterFilter1)
+        self._sps = register_filter1.SPS
+        self._update_sps()
+
+    def _update_sps(self) -> None:
+        self._duration_max_sample = int(self._duration_max_s * self._sps)
+
+    @property
+    def duration_max_s(self) -> int:
+        return self._duration_max_s
+
+    @duration_max_s.setter
+    def duration_max_s(self, value: int) -> None:
+        self._duration_max_s = value
+        self._update_sps()
+
+    def _done(self) -> None:
+        self.done_event.set()
+        self.state = State.ARMED
+
+    def wait_for_acquisition(self) -> None:
+        """
+        We capture a new shot.
+        Reset the last shot and get ready.
+        """
+        with self.lock:
+            self.capturer = None
+            self.out_timeout = False
+            self.out_falling = False
+            self.out_raising = False
+            self.out_falling_s = 0.0
+            self.out_enabled_s = 0.0
+            self.time_armed_start_s: float = time.monotonic()
+            self.state = State.CAPTURING
+            self.done_event.clear()
+        self.done_event.wait()
+
+        logger.info(f"    {len(self.capturer.IN_voltage)}samples")
+        logger.info(f"    {self._sps:0.0f}SPS")
+        logger.info(f"    out_timeout={self.out_timeout}")
+        logger.info(
+            f"    out_falling={self.out_falling} out_falling_s={self.out_falling_s:0.3f}s"
+        )
+        logger.info(
+            f"    out_raising={self.out_raising} out_enabled_s={self.out_enabled_s:0.3f}s"
+        )
+
+    def append(self, measurements: MeasurementSequence, idx0_start: int) -> None:
+        with self.lock:
+            if self.capturer is None:
+                self.capturer = Capturer(
+                    IN_voltage=measurements.adc_value_V[idx0_start:],
+                    IN_disable=measurements.IN_disable[idx0_start:],
+                    IN_t=measurements.IN_t[idx0_start:],
+                )
+            else:
+                self.capturer.append(measurements=measurements)
+            logger.info(f"{self.state.name} append({len(measurements.adc_value_V)})")
+
+    def found_raising_edge(self) -> bool:
+        if not self.out_falling:
+            # No falling edge yet
+            idx0 = self.capturer.find_first0(self.capturer.IN_disable)
+            if idx0 is not None:
+                # We found a falling edge
+                self.capturer.limit_begin(idx0=idx0 - (1 if ADD_PRE_POST_SAMPLE else 0))
+                if ADD_PRE_POST_SAMPLE:
+                    # Change the value temporarely to allow triggering of the raising edge
+                    self.capturer.IN_disable[0] = False
+                self.out_falling = True
+                self.out_falling_s = idx0 / self._sps
+                logger.info(
+                    f"Falling edge: idx0={idx0} self._sps={self._sps} self.out_falling_s={self.out_falling_s:0.3f}s"
+                )
+                return False
+        else:
+            # Falling edge detected, now look for raising edge
+            idx0 = self.capturer.find_first1(self.capturer.IN_disable)
+            if idx0 is not None:
+                # We found a raising edge
+                if ADD_PRE_POST_SAMPLE:
+                    self.capturer.IN_disable[0] = True
+                self.capturer.limit_end(idx0=idx0 + (1 if ADD_PRE_POST_SAMPLE else 0))
+                self.out_raising = True
+                self.out_enabled_s = idx0 / self._sps
+                logger.info(
+                    f"Raising edge: idx0={idx0} self._sps={self._sps} self.out_enabled_s={self.out_enabled_s:0.3f}s"
+                )
+                with self.lock:
+                    self.state = State.ARMED
+                    self._done()
+                return False
+
+        self.out_timeout = len(self.capturer.IN_disable) > self._duration_max_sample
+        if self.out_timeout:
+            if ADD_PRE_POST_SAMPLE and self.out_falling:
+                self.capturer.IN_disable[0] = True
+            logger.info(
+                f"TIMEOUT {len(self.capturer.IN_disable)}({self._duration_max_sample})samples {self.duration_max_s:0.3f}s {self._sps}SPS"
+            )
+            with self.lock:
+                self.state = State.ARMED
+                self._done()
+            return True
+
+        return False
+
+        # self.capturer.limit_begin(max(0, idx0-5))
+        self.capturer.limit_begin(idx0)
+
+        idx0 = self.capturer.find_first1(self.capturer.IN_disable)
+        if idx0 is None:
+            return False
+
+        self.capturer.limit_end(idx0=idx0 + 5)
+        with self.lock:
+            self.state = State.ARMED
+            self._done()
+            logger.info(
+                f"{self.state.name} stop({len(self.capturer.IN_voltage)}, idx0_end={idx0})"
+            )
+        logger.info(f"found_raising_edge idx0={idx0})")
+        return True
+
+
+class AdThread(threading.Thread):
     """
     EVERY communication between Labber GUI and visa_station is routed via this class!
 
@@ -54,403 +292,212 @@ class UsbThread(threading.Thread):
     def __init__(self):
         self.dict_values_labber_thread_copy = {}
         super().__init__(daemon=True)
-        # self._visa_station = AMI430_visa.VisaStation(station=station)
-        # logger.info(f"LabberThread(config='{self.station.name}')")
+        self.ad = AdLowNoiseFloat2023()
+        self.register_filter1: RegisterFilter1 = RegisterFilter1.SPS_97656
+        self.ad_needs_reconnect: bool = False
+        self._aquisition = Acquistion()
         self._stopping = False
-        # self._visa_station.open()
-        self.start()
-
-    # @property
-    # def station(self) -> Station:
-    #     return self._visa_station.station
-
-    # @property
-    # def visa_station(self) -> AMI430_visa.VisaStation:
-    #     return self._visa_station
 
     def run(self):
-        while not self._stopping:
-            start_s = time.time()
-            try:
-                self._tick()
-            except ad_utils.DriverAbortException as ex:
-                logger.error(f"ad_utils.DriverAbortException(): {ex}")
-                logger.exception(ex)
-                raise
+        """
+        import numpy as np
+        >>> np.array([1, 1, 0, 1], bool)
+        array([ True,  True, False,  True])
+        >>> np.nonzero(a)
+        (array([0, 1, 3]),)
+        >>> np.nonzero(a == 1)
+        (array([0, 1, 3]),)
+        >>> np.nonzero(a == 0)
+        (array([2]),)
 
-            except Exception as ex:
-                # Log the error but keep running
-                logger.exception(ex)
-
-            elapsed_s = time.time() - start_s
-            if elapsed_s > TICK_INTERVAL_S:
-                logger.warning(
-                    f"tick() took:{elapsed_s:0.3f}s. Expected <= {TICK_INTERVAL_S:0.3f}s"
+        >>> b = np.array([0, 0, 0, 0], bool)
+        >>> np.nonzero(b == 1)
+        (array([], dtype=int64),)
+        >>> len(y[0])
+        0
+        """
+        while True:
+            pcb_params = PcbParams(
+                input_Vp=1.0, register_filter1=self.register_filter1, resolution22=True
+            )
+            if TODO_REMOVE:
+                logger.info(
+                    f"connect with input_Vp={pcb_params.input_Vp:0.1f}V, SPS={self.register_filter1.name}"
                 )
-            time.sleep(TICK_INTERVAL_S)
+            self.ad_needs_reconnect = False
+            # Read the jumper settings
+            if TODO_REMOVE:
+                logger.info(
+                    f"TODO REMOVE self.ad.decoder.size()={self.ad.decoder.size()} Bytes"
+                )
+            logger.info("connect(): Start reconnect to update SPS.")
+            self.ad.connect(pcb_params=pcb_params)
+            logger.info("connect(): Done reconnect to update SPS.")
+            self._aquisition.set_SPS(pcb_params.register_filter1)
+            settings_program = self.ad.pcb_status.settings["PROGRAM"]
+            REQUIRED_VERSION = "ad_low_noise_float_2023(0.3.10)"
+            if (settings_program < REQUIRED_VERSION) or (
+                len(settings_program) < len(REQUIRED_VERSION)
+            ):
+                raise ValueError(
+                    f"Found '{settings_program}' but required at least '{REQUIRED_VERSION}'!"
+                )
+
+            for measurements in self.ad.iter_measurements_V(
+                pcb_params=pcb_params, do_connect=False
+            ):
+                if self._stopping:
+                    return
+                if self.ad_needs_reconnect:
+                    break
+
+                def handle_state(measurements: MeasurementSequence) -> None:
+
+                    if self._aquisition.state is State.CAPTURING:
+                        if TODO_REMOVE:
+
+                            logger.info(
+                                f"TODO REMOVE self.ad.decoder.size()={self.ad.decoder.size()} Bytes"
+                            )
+
+                        self._aquisition.append(
+                            measurements=measurements,
+                            idx0_start=self.ad.decoder.size(),
+                        )
+                        if self._aquisition.found_raising_edge():
+                            return
+
+                handle_state(measurements)
+                # logger.info(f"TODO REMOVE handle_state({self._aquisition.state.name})")
+
+                def log_IN_disable_t(measurements: MeasurementSequence) -> None:
+                    msg = f"adc_value_V={measurements.adc_value_V[0]:5.2f}->{measurements.adc_value_V[-1]:5.2f}"
+                    msg += f" IN_disable={measurements.IN_disable[0]:d}->{measurements.IN_disable[-1]:d}"
+                    msg += f" IN_t={measurements.IN_t[0]:d}->{measurements.IN_t[-1]:d}"
+                    msg += f" state={self._aquisition.state.name}"
+                    msg += f" decoder.size()={self.ad.decoder.size()//3:5d} Samples"
+                    if self._aquisition.state is State.CAPTURING:
+                        msg += f" samples={len(self._aquisition.capturer.IN_voltage)}"
+                    logger.info(msg)
+
+                if False:
+                    log_IN_disable_t(measurements)
+
+                def log_errors(measurements: MeasurementSequence):
+                    error_codes = self.ad.pcb_status.list_errors(
+                        error_code=measurements.errors, inclusive_status=True
+                    )
+                    elements = []
+                    elements.append(f"{measurements.adc_value_V[-1]:0.2f}V")
+                    elements.append(f"{len(measurements.adc_value_V)}")
+                    if measurements.IN_disable is not None:
+                        elements.append(f"IN_disable={measurements.IN_disable[-1]}")
+                    if measurements.IN_t is not None:
+                        elements.append(f"IN_t={measurements.IN_t[-1]}")
+                    elements.append(f"{int(measurements.errors):016b}")
+                    elements.append(f"{error_codes}")
+                    print(" ".join(elements))
+
+                if False:
+                    log_errors(measurements)
 
     def stop(self):
         self._stopping = True
         self.join(timeout=10.0)
+        self.ad.close()
 
     @synchronized
     def _tick(self) -> None:
         """
         Called by the thread: synchronized to make sure that the labber GUI is blocked
         """
-        self._visa_station.tick()
+        # self._visa_station.tick()
         # Create a copy of all values to allow access for the labber thread without any delay.
         # self.dict_values_labber_thread_copy = self._visa_station.dict_values.copy()
 
-    # @synchronized
-    # def set_quantity_sync(self, quantity: Quantity, value):
-    #     """
-    #     Called by labber GUI
-    #     """
-    #     return self._visa_station.set_quantity(quantity=quantity, value=value)
-
-    # @synchronized
-    # def wait_till_ramped_sync(self):
-    #     self._visa_station.wait_till_ramped()
-
-    # def set_value(self, name: str, value):
-    #     """
-    #     Called by the tread (visa_station):
-    #     Update a value which may be retrieved later by the labber GUI using 'get_quantity_sync'.
-    #     """
-
-    #     assert isinstance(name, str)
-    #     quantity = Quantity(name)
-
-    #     if quantity is Quantity.ControlWriteTemperatureAndSettle_K:
-    #         return self._set_temperature_and_settle(quantity=quantity, value=value)
-
-    #     return self.set_quantity_sync(quantity=quantity, value=value)
-
-    # def _set_temperature_and_settle_obsolete(self, quantity: Quantity, value: float):
-    #     assert quantity is Quantity.ControlWriteTemperatureAndSettle_K
-
-    #     def block_until_settled():
-    #         tick_count_before = self._visa_station.tick_count
-    #         timeout_s = self._visa_station.time_now_s + self._visa_station.get_quantity(
-    #             Quantity.ControlWriteTimeoutTime_S
-    #         )
-    #         while True:
-    #             self._visa_station.sleep(TICK_INTERVAL_S / 2.0)
-    #             if tick_count_before == self._visa_station.tick_count:
-    #                 # Wait for a tick to make sure that the statemachine was called at least once
-    #                 continue
-    #             if not self._visa_station.hsm_heater.is_state(
-    #                 HeaterHsm.state_connected_thermon_heatingcontrolled
-    #             ):
-    #                 # Unexpected state change
-    #                 logger.info(
-    #                     f"Waiting for 'ControlWriteTemperatureAndSettle_K'. Unexpected state change. Got '{self._visa_station.hsm_heater._state_actual}'!"
-    #                 )
-    #                 return
-    #             if self._is_settled():
-    #                 return
-    #             if self._visa_station.time_now_s > timeout_s:
-    #                 logger.info("Timeout while 'ControlWriteTemperatureAndSettle_K'")
-    #                 return
-
-    #     if abs(value - heater_wrapper.TEMPERATURE_SETTLE_OFF_K) < 1.0e-9:
-    #         logger.warning(f"'{quantity.value}' set to {value:0.1f} K: SKIPPED")
-    #         return
-
-    #     self._visa_station.set_quantity(Quantity.ControlWriteTemperature_K, value)
-    #     self._visa_station.hsm_heater.wait_temperature_and_settle_start()
-    #     logger.warning(
-    #         f"'{quantity.value}' set to {value:0.1f} K: Blocking. Timeout = {self._visa_station.get_quantity(Quantity.ControlWriteTimeoutTime_S)}s"
-    #     )
-    #     block_until_settled()
-    #     self._visa_station.hsm_heater.wait_temperature_and_settle_over()
-    #     logger.warning("Settle/Timeout time over")
-    #     return heater_wrapper.TEMPERATURE_SETTLE_OFF_K
-
-    # @synchronized
-    # def set_quantity(self, quantity: Quantity, value):
-    #     return self._visa_station.set_quantity(quantity=quantity, value=value)
-
-    # def get_value(self, name: str):
-    #     """
-    #     This typically returns immedately as it accesses a copy of all values.
-    #     Only in rare cases, it will delay for max 0.5s.
-    #     """
-    #     assert isinstance(name, str)
-    #     quantity = Quantity(name)
-    #     try:
-    #         value = self.dict_values_labber_thread_copy[quantity]
-    #     except KeyError:
-    #         # Not all values are stored in the dictionary.
-    #         # In this case we have to use the synchronized call.
-    #         value = self.get_quantity_sync(quantity=quantity)
-    #     if isinstance(value, enum.Enum):
-    #         return value.value
-    #     return value
-
-    # @synchronized
-    # def get_quantity_sync(self, quantity: Quantity):
-    #     return self._visa_station.get_quantity(quantity=quantity)
-
-    # @synchronized
-    # def signal(self, signal):
-    #     self._visa_station.signal(signal)
-
-    # @synchronized
-    # def expect_state(self, expected_meth):
-    #     self._visa_station.expect_state(expected_meth=expected_meth)
-
-
-RE_STATUS_BYTE_MASK = re.compile(r"STATUS_BYTE_MASK=0x(\w+)")
-
-
-class OutOfSyncException(Exception):
-    pass
-
-
-@dataclasses.dataclass
-class BcbStatus:
-    """
-    status: BEGIN=1
-    status: PROGRAM=ad_low_noise_float_2023(0.3.3)
-    status: REGISTER_FILTER1=0x02
-    status: REGISTER_MUX=0x00
-    status: SEQUENCE_LEN_MIN=1000
-    status: SEQUENCE_LEN_MAX=30000
-    status: ERROR_MOCKED=1
-    status: ERROR_MOCKED=1
-    status: ERROR_ADS127_MOD=2
-    status: ERROR_ADS127_ADC=4
-    status: ERROR_FIFO=8
-    status: ERROR_ADS127_SPI=16
-    status: ERROR_ADS127_POR=32
-    status: ERROR_ADS127_ALV=64
-    status: ERROR_OVLD=128
-    status: ERROR_STATUS_J42=256
-    status: ERROR_STATUS_J43=512
-    status: ERROR_STATUS_J44=1024
-    status: ERROR_STATUS_J45=2048
-    status: ERROR_STATUS_J46=4096
-    status: END=1
-    """
-
-    settings: dict[str, str] = dataclasses.field(default_factory=dict)
-    error_codes: dict[int, str] = dataclasses.field(default_factory=dict)
-
-    def add(self, line: str) -> None:
-        key, value = line.split("=", 1)
-        self.add_setting(key.strip(), value.strip())
-
-    def add_setting(self, key: str, value: str) -> None:
-        assert isinstance(key, str)
-        assert isinstance(value, str)
-        self.settings[key] = value
-
-        if key.startswith("ERROR_"):
-            try:
-                value_int = int(value, 0)
-                bit_position = 0
-                while value_int > 1:
-                    value_int >>= 1
-                    bit_position += 1
-                self.error_codes[bit_position] = key
-            except ValueError:
-                logger.warning(f"Invalid error code: {key}={value}")
-
-    def validate(self) -> None:
-        assert self.settings["BEGIN"] == "1"
-        assert self.settings["END"] == "1"
-
-    def list_errors(self, error_code: int, inclusive_status: bool) -> list[str]:
+    @synchronized
+    def wait_measurements(self) -> None:
         """
-        Returns a list of error messages for the given error code.
+        This method will until the measurements are acquired.
         """
-        assert isinstance(error_code, int)
-        # return a list of bit positions which are set in error_code
-        error_bits = [i for i in range(32) if (error_code & (1 << i)) != 0]
+        if TODO_REMOVE:
+            logger.info("TODO REMOVE wait_measurements() ENTER")
+        self._aquisition.wait_for_acquisition()
+        if TODO_REMOVE:
+            logger.info("TODO REMOVE wait_measurements() LEAVE")
 
-        error_strings = [self.error_codes[bit_position] for bit_position in error_bits]
-        if not inclusive_status:
-            error_strings = [
-                x for x in error_strings if not x.startswith("ERROR_STATUS_")
-            ]
-        return error_strings
+        CHANNEL_DISABLE.data = self._aquisition.capturer.IN_disable
+        CHANNEL_T.data = self._aquisition.capturer.IN_t
+        CHANNEL_VOLTAGE.data = self._aquisition.capturer.IN_voltage
 
-    @property
-    def gain_from_jumpers(self) -> float:
-        status_J42_J46 = int(self.settings["STATUS_J42_J46"], 0)
-        status_J42_J43 = status_J42_J46 & 0b11
-        return {
-            0: 1.0,
-            1: 2.0,  # J42
-            2: 5.0,  # J43
-            3: 10.0,  # J42, J43
-        }[status_J42_J43]
-
-
-class Adc:
-    PRINTF_INTERVAL_S = 10.0
-    VID = 0x2E8A
-    PID = 0x4242
-    MEASURMENT_BYTES = 3
-    COMMAND_START = "s"
-    COMMAND_STOP = "p"
-    COMMAND_MOCKED_ERROR = "e"
-    COMMAND_MOCKED_CRC = "c"
-
-    SEQUENCE_LEN_MAX = 30_000
-    BYTES_PER_MEASUREMENT = 3
-    DECODER_OVERFLOW_SIZE = 4 * BYTES_PER_MEASUREMENT * SEQUENCE_LEN_MAX
-
-    def __init__(self) -> None:
-        self.serial = self._open_serial()
-        self.success: bool = False
-        self.pcb_status = BcbStatus()
-        self.decoder = ad_low_noise_float_2023_decoder.Decoder()
-
-    def _open_serial(self) -> serial.Serial:
-        ports = serial.tools.list_ports.comports()
-        for port in ports:
-            if port.vid == self.VID:
-                if port.pid == self.PID:
-                    return serial.Serial(port=port.device, timeout=1.0)
-
-        raise ValueError(
-            f"No board with VID=0x{self.VID:02X} and PID=0x{self.PID:02X} found!"
-        )
-
-    def close(self) -> None:
-        self.serial.close()
-
-    def drain(self) -> None:
-        while True:
-            line = self.serial.read()
-            if len(line) == 0:
-                return
-
-    def read_status(self) -> bool:
-        self.success, self.pcb_status = self._read_status_inner()
-        self.pcb_status.validate()
-        return self.success
-
-    def _read_status_inner(self) -> tuple[bool, BcbStatus]:
+    @synchronized
+    def set_quantity_sync(self, quant_name: str, value):
         """
-        return True on success
+        Returns the new value.
+        Returns None if quant.name does not match.
         """
-        status = BcbStatus()
-        while True:
-            line_bytes = self.serial.readline()
-            if len(line_bytes) == 0:
-                return False, status
-            line = line_bytes.decode("ascii").strip()
-            status.add(line)
-            logger.info(f"  status: {line}")
-            if line == "END=1":
-                return True, status
-
-    def test_usb_speed(self) -> None:
-        begin_ns = time.monotonic_ns()
-        counter = 0
-        while True:
-            measurements = self.serial.read(size=1_000_000)
-            # print(f"len={len(measurements)/3}")
-            self.decoder.push_bytes(measurements)
-
-            while True:
-                numpy_array = self.decoder.get_numpy_array()
-                if numpy_array is None:
-                    print(".", end="")
-                    break
-                if self.decoder.get_crc() != 0:
-                    logger.error(f"ERROR crc={self.decoder.get_crc()}")
-                if self.decoder.get_errors() not in (0, 8, 72):
-                    logger.error(f"ERROR errors={self.decoder.get_errors()}")
-
-                counter += len(numpy_array)
-                duration_ns = time.monotonic_ns() - begin_ns
-                logger.info(f"{1e9 * counter / duration_ns:0.1f} SPS")
-
-                # counter += len(measurements) // 3
-                # duration_ns = time.monotonic_ns() - begin_ns
-                # print(f"{1e9*counter/duration_ns:0.1f} SPS")
-
-        # Pico:197k  PC Peter 96k (0.1% CPU auslasung)
-
-    def iter_measurements(self) -> typing.Iterable[np.ndarray]:
-        while True:
-            measurements = self.serial.read(size=1_000_000)
-            # print(f"len={len(measurements)/3}")
-            self.decoder.push_bytes(measurements)
-
-            while True:
-                adc_value_ain_signed32 = self.decoder.get_numpy_array()
-                if adc_value_ain_signed32 is None:
-                    # print(".", end="")
-                    if self.decoder.size() > self.DECODER_OVERFLOW_SIZE:
-                        msg = "f'Segment overflow! decoder.size {self.decoder.size()} > DECODER_OVERFLOW_SIZE {self.DECODER_OVERFLOW_SIZE}'"
-                        # print(msg)
-                        raise OutOfSyncException(msg)
-                    break
-                # counter += len(adc_value_ain_signed32)
-                if self.decoder.get_crc() != 0:
-                    msg = f"ERROR crc={self.decoder.get_crc()}"
-                    # print(msg)
-                    raise OutOfSyncException(msg)
-
-                errors = self.decoder.get_errors()
-                error_strings = self.pcb_status.list_errors(
-                    errors,
-                    inclusive_status=False,
+        if quant_name == "sample_rate_SPS":
+            before = self.register_filter1
+            self.register_filter1 = RegisterFilter1.factory(value)
+            assert isinstance(self.register_filter1, RegisterFilter1)
+            if before != self.register_filter1:
+                logger.info(
+                    f"SPS changed from {before.name} to {self.register_filter1.name}: Requires reconnect to the AD pico."
                 )
-                if len(error_strings) > 0:
-                    msg = f"ERROR: {errors}: {' '.join(error_strings)}"
-                    logger.error(msg)
+                self.ad_needs_reconnect = True
+            return value
 
-                # duration_s = time.monotonic() - begin_s
-                # if duration_s > self.PRINTF_INTERVAL_S:
-                #     print(
-                #         f"{adc_value_ain_signed32[0]=:2.6f}  {counter/duration_s:0.1f} SPS"
-                #     )
-                #     begin_s = time.monotonic()
-                #     counter = 0
+        if quant_name == "duration_max_s":
+            value = max(0.001, value)
+            value = min(1000, value)
+            self._aquisition.duration_max_s = value
+            return value
 
-                yield adc_value_ain_signed32
+        return None
+
+    @synchronized
+    def get_quantity_sync(self, quant):
+        if quant.name == "Input range":
+            return self.ad.pcb_status.gain_from_jumpers
+
+        if quant.name == "sample_rate_SPS":
+            return self.register_filter1.name
+
+        if quant.name == "duration_max_s":
+            return self._aquisition.duration_max_s
+
+        if quant.name == "out_timeout":
+            return self._aquisition.out_timeout
+
+        if quant.name == "out_falling":
+            return self._aquisition.out_falling
+
+        if quant.name == "out_raising":
+            return self._aquisition.out_raising
+
+        if quant.name == "out_falling_s":
+            return self._aquisition.out_falling_s
+
+        if quant.name == "out_enabled_s":
+            return self._aquisition.out_enabled_s
+
+        return None
 
 
 def main_standalone():
-    def _send_command_reset():
-        msg = f"send command reset: {RegisterFilter1.SPS_97656!r} {RegisterMux.NORMAL_INPUT_POLARITY!r}"
-        logger.info(msg)
-        additional_SPI_reads = 0
-        command_reset = f"r-{RegisterFilter1.SPS_97656:02X}-{RegisterMux.NORMAL_INPUT_POLARITY:02X}-{additional_SPI_reads:d}"
-        _send_command(command_reset)
-
-    def _send_command(command: str) -> None:
-        logger.info(f"send command: {command}")
-        command_bytes = f"\n{command}\n".encode("ascii")
-        adc.serial.write(command_bytes)
-
     logging.basicConfig()
     logger.setLevel(logging.DEBUG)
+    logger_ad.setLevel(logging.DEBUG)
 
-    adc = Adc()
+    thread = AdThread()
+    if False:
+        thread.run()
+    if True:
+        thread.start()
+        time.sleep(2.0)
+        print(40 * "=")
+        thread.wait_measurements()
 
-    _send_command(Adc.COMMAND_STOP)
-    adc.drain()
-    _send_command_reset()
-    adc.read_status()
-    _send_command(Adc.COMMAND_START)
-    while True:
-            try:
-                for adc_value_ain_signed32 in adc.iter_measurements():
-                    print(len(adc_value_ain_signed32))
-            except OutOfSyncException as e:
-                logger.error(f"OutOfSyncException: {e}")
-                bytes_purged = adc.decoder.purge_until_and_with_separator()
-                logger.info(f"Purged {bytes_purged} bytes!")
-
-                # self.connect()
 
 if __name__ == "__main__":
     main_standalone()

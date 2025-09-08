@@ -1,7 +1,7 @@
 # Scenario: trigger
-def scenario():
-    IN_t(1)
-    IN_P(IN_P_1V4)
-    wait_ms(50)
-    IN_t(0)
-    IN_P(IN_P_0V0)
+def scenario(ctx):
+    ctx.IN_t(1)
+    ctx.IN_P_1V4()
+    ctx.wait_ms(50)
+    ctx.IN_t(0)
+    ctx.IN_P_0V0()
