@@ -1,16 +1,11 @@
 from __future__ import annotations
 import time
 import logging
-import threading
 import typing
-import re
-import dataclasses
-import serial
-import serial.tools.list_ports
-import numpy as np
+import threading
 
 from ad_low_noise_float_2023.ad import AdLowNoiseFloat2023, LOGGER_NAME
-from ad_low_noise_float_2023.constants import PcbParams
+from ad_low_noise_float_2023.constants import PcbParams, RegisterFilter1
 
 import ad_utils
 
@@ -54,7 +49,12 @@ class AdThread(threading.Thread):
     def __init__(self):
         self.dict_values_labber_thread_copy = {}
         super().__init__(daemon=True)
-        self.adc = AdLowNoiseFloat2023()
+        self.ad = AdLowNoiseFloat2023()
+        self.register_filter1: RegisterFilter1 = RegisterFilter1.SPS_03052
+        self.input_Vp: float = 0.001
+        self.ad_needs_reconnect: bool = False
+
+
         # self._visa_station = AMI430_visa.VisaStation(station=station)
         # logger.info(f"LabberThread(config='{self.station.name}')")
         self._stopping = False
@@ -70,12 +70,17 @@ class AdThread(threading.Thread):
     #     return self._visa_station
 
     def run(self):
-        pcb_params=PcbParams(input_Vp=1.0)
 
-        for _adc_value_V in self.adc.iter_measurements_V(pcb_params=pcb_params):
-            if self._stopping:
-                return
-            pass
+        while True:
+            pcb_params=PcbParams(input_Vp=1.0, register_filter1=self.register_filter1)
+            logger.info(f"connect with input_Vp={pcb_params.input_Vp:0.1f}V, SPS={self.register_filter1.name}")
+            for _adc_value_V in self.ad.iter_measurements_V(pcb_params=pcb_params):
+                if self._stopping:
+                    return
+                if self.ad_needs_reconnect:
+                    self.ad_needs_reconnect = False
+                    break
+                pass
 
         return
         while not self._stopping:
@@ -101,7 +106,7 @@ class AdThread(threading.Thread):
     def stop(self):
         self._stopping = True
         self.join(timeout=10.0)
-        self.adc.close()
+        self.ad.close()
 
     @synchronized
     def _tick(self) -> None:
@@ -178,9 +183,21 @@ class AdThread(threading.Thread):
     #     logger.warning("Settle/Timeout time over")
     #     return heater_wrapper.TEMPERATURE_SETTLE_OFF_K
 
-    # @synchronized
-    # def set_quantity(self, quantity: Quantity, value):
-    #     return self._visa_station.set_quantity(quantity=quantity, value=value)
+    @synchronized
+    def set_quantity(self, quant_name: str, value):
+        if quant_name == "Sample rate SPS":
+            self.register_filter1 = RegisterFilter1.factory(value)
+            assert isinstance(self.register_filter1, RegisterFilter1)
+            self.ad_needs_reconnect = True
+            return value
+        
+        if quant_name == "input_Vp":
+            self.input_Vp = value
+            assert isinstance(self.input_Vp, float)
+            self.ad_needs_reconnect = True
+            return value
+
+        return value
 
     # def get_value(self, name: str):
     #     """

@@ -37,7 +37,7 @@ class Driver(InstrumentDriver.InstrumentWorker):
         """Perform the operation of opening the instrument connection"""
 
         # Reset the usb connection (it must not change the applied voltages)
-        self.log("AMI 430 Magnets Driver")
+        self.log("labber_ad_low_noise_float_2023 Driver")
         # station = AMI430_driver_config.get_station()
         assert self._thread is None
         self._thread = ad_thread.AdThread()
@@ -67,7 +67,9 @@ class Driver(InstrumentDriver.InstrumentWorker):
         if self.isFirstCall(options):
             logger.info(f"********** FIRST CALL '{quant.name}' {value}: {options}")
 
-        value_new = value
+        self._thread.set_quantity(quant_name=quant.name, value=value)
+
+        return value
 
         # try:
         #     quantity = Quantity(quant.name)
