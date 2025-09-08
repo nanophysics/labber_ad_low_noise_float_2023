@@ -3,23 +3,23 @@ import time
 import logging
 import threading
 import typing
-import enum
 import re
 import dataclasses
 import serial
 import serial.tools.list_ports
-
-import ad_low_noise_float_2023_decoder
-from constants_ad_low_noise_float_2023 import     RegisterFilter1,    RegisterMux
-
-
 import numpy as np
+
+from ad_low_noise_float_2023.ad import AdLowNoiseFloat2023, LOGGER_NAME
+from ad_low_noise_float_2023.constants import PcbParams
 
 import ad_utils
 
 TICK_INTERVAL_S = 0.5
 
 logger = logging.getLogger("LabberDriver")
+
+logger_ad = logging.getLogger(LOGGER_NAME)
+logger_ad.setLevel(logging.DEBUG)
 
 LOCK = threading.Lock()
 
@@ -36,7 +36,7 @@ def synchronized(func):
     return wrapper
 
 
-class UsbThread(threading.Thread):
+class AdThread(threading.Thread):
     """
     EVERY communication between Labber GUI and visa_station is routed via this class!
 
@@ -54,6 +54,7 @@ class UsbThread(threading.Thread):
     def __init__(self):
         self.dict_values_labber_thread_copy = {}
         super().__init__(daemon=True)
+        self.adc = AdLowNoiseFloat2023()
         # self._visa_station = AMI430_visa.VisaStation(station=station)
         # logger.info(f"LabberThread(config='{self.station.name}')")
         self._stopping = False
@@ -69,6 +70,14 @@ class UsbThread(threading.Thread):
     #     return self._visa_station
 
     def run(self):
+        pcb_params=PcbParams(input_Vp=1.0)
+
+        for _adc_value_V in self.adc.iter_measurements_V(pcb_params=pcb_params):
+            if self._stopping:
+                return
+            pass
+
+        return
         while not self._stopping:
             start_s = time.time()
             try:
@@ -92,13 +101,14 @@ class UsbThread(threading.Thread):
     def stop(self):
         self._stopping = True
         self.join(timeout=10.0)
+        self.adc.close()
 
     @synchronized
     def _tick(self) -> None:
         """
         Called by the thread: synchronized to make sure that the labber GUI is blocked
         """
-        self._visa_station.tick()
+        # self._visa_station.tick()
         # Create a copy of all values to allow access for the labber thread without any delay.
         # self.dict_values_labber_thread_copy = self._visa_station.dict_values.copy()
 
@@ -419,38 +429,19 @@ class Adc:
 
 
 def main_standalone():
-    def _send_command_reset():
-        msg = f"send command reset: {RegisterFilter1.SPS_97656!r} {RegisterMux.NORMAL_INPUT_POLARITY!r}"
-        logger.info(msg)
-        additional_SPI_reads = 0
-        command_reset = f"r-{RegisterFilter1.SPS_97656:02X}-{RegisterMux.NORMAL_INPUT_POLARITY:02X}-{additional_SPI_reads:d}"
-        _send_command(command_reset)
-
-    def _send_command(command: str) -> None:
-        logger.info(f"send command: {command}")
-        command_bytes = f"\n{command}\n".encode("ascii")
-        adc.serial.write(command_bytes)
-
     logging.basicConfig()
     logger.setLevel(logging.DEBUG)
 
-    adc = Adc()
+    logger_ad = logging.getLogger(LOGGER_NAME)
+    logger_ad.setLevel(logging.DEBUG)
 
-    _send_command(Adc.COMMAND_STOP)
-    adc.drain()
-    _send_command_reset()
-    adc.read_status()
-    _send_command(Adc.COMMAND_START)
-    while True:
-            try:
-                for adc_value_ain_signed32 in adc.iter_measurements():
-                    print(len(adc_value_ain_signed32))
-            except OutOfSyncException as e:
-                logger.error(f"OutOfSyncException: {e}")
-                bytes_purged = adc.decoder.purge_until_and_with_separator()
-                logger.info(f"Purged {bytes_purged} bytes!")
+    adc = AdLowNoiseFloat2023()
 
-                # self.connect()
+    pcb_params=PcbParams(input_Vp=1.0)
+
+    for _adc_value_V in adc.iter_measurements_V(pcb_params=pcb_params):
+        pass
+        # print(len(_adc_value_V))
 
 if __name__ == "__main__":
     main_standalone()
