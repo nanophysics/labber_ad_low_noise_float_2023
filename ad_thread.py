@@ -70,6 +70,7 @@ class AdThread(threading.Thread):
                     return
                 if self.ad_needs_reconnect:
                     break
+                print(errors)
                 pass
 
         return

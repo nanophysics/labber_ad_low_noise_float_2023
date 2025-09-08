@@ -25,7 +25,7 @@ pin_IN_t.value(0)
 
 IN_P_0V0 = (0, 0)
 IN_P_0V7 = (0, 1)
-IN_P_1V4 = (1, 0)
+IN_P_1V4 = (1, 1)
 
 def IN_disable(v):
     pin_IN_disable.value(v)

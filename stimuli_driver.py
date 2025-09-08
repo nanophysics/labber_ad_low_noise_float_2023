@@ -82,4 +82,6 @@ class Driver(InstrumentDriver.InstrumentWorker):
         # else:
         #     # for other quantities, just return current value of control
         #     return quant.getValue()
-        quant.getValue()
+
+        # just return the quantity value
+        return quant.getValue()
