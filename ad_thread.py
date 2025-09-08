@@ -3,6 +3,7 @@ import time
 import logging
 import typing
 import threading
+import numpy as np
 
 from ad_low_noise_float_2023.ad import AdLowNoiseFloat2023, LOGGER_NAME
 from ad_low_noise_float_2023.constants import PcbParams, RegisterFilter1
@@ -51,34 +52,23 @@ class AdThread(threading.Thread):
         super().__init__(daemon=True)
         self.ad = AdLowNoiseFloat2023()
         self.register_filter1: RegisterFilter1 = RegisterFilter1.SPS_03052
-        self.input_Vp: float = 0.001
         self.ad_needs_reconnect: bool = False
 
-
-        # self._visa_station = AMI430_visa.VisaStation(station=station)
-        # logger.info(f"LabberThread(config='{self.station.name}')")
         self._stopping = False
-        # self._visa_station.open()
         self.start()
 
-    # @property
-    # def station(self) -> Station:
-    #     return self._visa_station.station
-
-    # @property
-    # def visa_station(self) -> AMI430_visa.VisaStation:
-    #     return self._visa_station
 
     def run(self):
-
         while True:
             pcb_params=PcbParams(input_Vp=1.0, register_filter1=self.register_filter1)
             logger.info(f"connect with input_Vp={pcb_params.input_Vp:0.1f}V, SPS={self.register_filter1.name}")
-            for _adc_value_V in self.ad.iter_measurements_V(pcb_params=pcb_params):
+            self.ad_needs_reconnect = False
+            # Read the jumper settings
+            self.ad.connect(pcb_params=pcb_params)
+            for errors, adc_value_V in self.ad.iter_measurements_V(pcb_params=pcb_params, do_connect=False):
                 if self._stopping:
                     return
                 if self.ad_needs_reconnect:
-                    self.ad_needs_reconnect = False
                     break
                 pass
 
@@ -116,6 +106,17 @@ class AdThread(threading.Thread):
         # self._visa_station.tick()
         # Create a copy of all values to allow access for the labber thread without any delay.
         # self.dict_values_labber_thread_copy = self._visa_station.dict_values.copy()
+
+    @synchronized
+    def get_gain_from_jumpers_V(self) -> float:
+        return self.ad.pcb_status.gain_from_jumpers
+
+    @synchronized
+    def wait_trigger(self, dict_channels: typing.Dict[str, ad_utils.Channel]) -> None:
+        for idx, channel in enumerate(dict_channels.values()):
+            channel.data = np.array(
+                [1.0 * idx + i * 0.001 for i in range(12)]
+            )
 
     # @synchronized
     # def set_quantity_sync(self, quantity: Quantity, value):
@@ -191,12 +192,6 @@ class AdThread(threading.Thread):
             self.ad_needs_reconnect = True
             return value
         
-        if quant_name == "input_Vp":
-            self.input_Vp = value
-            assert isinstance(self.input_Vp, float)
-            self.ad_needs_reconnect = True
-            return value
-
         return value
 
     # def get_value(self, name: str):

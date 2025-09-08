@@ -33,6 +33,7 @@ class Driver(InstrumentDriver.InstrumentWorker):
         # self._ramping_required = True
         self.dict_channels = {ch.label: ch for ch in ad_utils.CHANNELS}
 
+
     def performOpen(self, options={}):
         """Perform the operation of opening the instrument connection"""
 
@@ -41,14 +42,6 @@ class Driver(InstrumentDriver.InstrumentWorker):
         # station = AMI430_driver_config.get_station()
         assert self._thread is None
         self._thread = ad_thread.AdThread()
-
-    # @property
-    # def station(self) -> Station:
-    #     return self._thread.station
-
-    # @property
-    # def visa_station(self) -> AMI430_visa.VisaStation:
-    #     return self._thread.visa_station
 
     def performClose(self, bError=False, options={}):
         """Perform the close instrument connection operation"""
@@ -71,38 +64,6 @@ class Driver(InstrumentDriver.InstrumentWorker):
 
         return value
 
-        # try:
-        #     quantity = Quantity(quant.name)
-        #     value_new = self._thread.set_quantity_sync(quantity=quantity, value=value)
-        #     if quantity in (
-        #         Quantity.ControlSetpointX,
-        #         Quantity.ControlSetpointY,
-        #         Quantity.ControlSetpointZ,
-        #         Quantity.ControlHoldCurrent,
-        #         Quantity.ControlHoldSwitchheaterOn,
-        #     ):
-        #         self._ramping_required = True
-
-        #     if self.isFinalCall(options):
-        #         if self.visa_station._mode is AMI430_visa.ControlMode.RAMPING_WAIT:
-        #             if self._ramping_required:
-        #                 self._ramping_required = False
-        #                 logger.info(
-        #                     f"********** FINAL CALL {quant.name} {value}: {options}"
-        #                 )
-        #                 self._thread.wait_till_ramped_sync()
-        #                 logger.info(
-        #                     f"********** FINAL CALL DONE {quant.name} {value}: {options}"
-        #                 )
-
-        #     return value_new
-        # except:
-        #     print(" ???", quant.name, value)
-        #     pass
-
-        # logger.error(f"performSetValue: Unknown quantity '{quant.name}' {value}")
-        # # if quant.name == "Control / Field target":
-        # #     raise
 
     def checkIfSweeping(self, quant):
         """Always return false, sweeping is done in loop"""
@@ -113,6 +74,9 @@ class Driver(InstrumentDriver.InstrumentWorker):
         # only implmeneted for geophone voltage
         logger.debug(f"performGetValue({quant.name})")
 
+        if quant.name == "Input range":
+            return self._thread.get_gain_from_jumpers_V()
+        
         channel = self.dict_channels.get(quant.name, None)
         if channel is not None:
             isFirstCall = self.isFirstCall(options)
@@ -120,7 +84,7 @@ class Driver(InstrumentDriver.InstrumentWorker):
 
             # check if first call, if so get new traces
             if isFirstCall:
-                self.getTraces()
+                self.wait_trigger()
 
             # return correct data
             return quant.getTraceDict(channel.data, dt=self.dt)
@@ -128,37 +92,19 @@ class Driver(InstrumentDriver.InstrumentWorker):
         # just return the quantity value
         return quant.getValue()
 
-    def getTraces(self):
+    def wait_trigger(self):
         """Resample the data"""
 
-        duration_max_s = float(self.getValue("duration max s"))
-        sample_rate_sps_text = self.getValue("Sample rate SPS")
-        sample_rate_sps = 97656  # TODO
-        sample_count = int(duration_max_s * sample_rate_sps)
+        self._thread.wait_trigger(self.dict_channels)
+        
+        # duration_max_s = float(self.getValue("duration max s"))
+        # sample_rate_sps_text = self.getValue("Sample rate SPS")
+        # sample_rate_sps = 97656  # TODO
+        # sample_count = int(duration_max_s * sample_rate_sps)
 
-        for idx, channel in enumerate(self.dict_channels.values()):
-            channel.data = np.array(
-                [1.0 * idx + i * 0.001 for i in range(sample_count)]
-            )
-
-        self.dt = 1.0 / sample_rate_sps
-
-        # data = self.mAI.readAll()
-        # # put data in list of channels
-        # for key, data in data.items():
-        #     indx = self.lChName.index(key)
-        #     self.lTrace[indx] = data
-        # self.dt = 1.0/self.getValue('Sample rate')
-
-        # try:
-        #     quantity = Quantity(quant.name)
-        # except:
-        #     raise Exception("performGetValue(): Unknown quant.name={quant.name} ")
-
-        # try:
-        #     value = self._thread.get_quantity_sync(quantity=quantity)
-        #     return value
-        # except:
-        #     raise Exception(
-        #         f"performGetValue(): Failed to get_quantity_sync(quantity={quantity}) "
+        # for idx, channel in enumerate(self.dict_channels.values()):
+        #     channel.data = np.array(
+        #         [1.0 * idx + i * 0.001 for i in range(sample_count)]
         #     )
+
+        # self.dt = 1.0 / sample_rate_sps
