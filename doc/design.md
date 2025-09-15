@@ -1,5 +1,9 @@
 # Design
 
+Schematics `pcb_ad_low_noise_float_2023.pdf`:
+* J45 - IN_disable
+* J46 - IN_t 
+
 ## Testing with pico board
 
 The triggering may be tested using a pico board.
@@ -65,3 +69,4 @@ wait_ms(50)
 IN_t(0)
 IN_P(IN_P_0V0)
 ```
+

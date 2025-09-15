@@ -65,12 +65,26 @@ class AdThread(threading.Thread):
             self.ad_needs_reconnect = False
             # Read the jumper settings
             self.ad.connect(pcb_params=pcb_params)
+            settings_program = self.ad.pcb_status.settings['PROGRAM']
+            REQUIRED_VERSION  = 'ad_low_noise_float_2023(0.3.6)'
+            if settings_program < REQUIRED_VERSION:
+                    raise ValueError(f"Found '{settings_program}' but required at least '{REQUIRED_VERSION}'!")
+                
+            bit_IN_disable_text = self.ad.pcb_status.settings['ERROR_STATUS_J45']
+            bit_IN_t_text = self.ad.pcb_status.settings['ERROR_STATUS_J46']
+            bit_IN_disable= int(bit_IN_disable_text, 16)
+            bit_IN_t= int(bit_IN_t_text, 16)
+
             for errors, adc_value_V in self.ad.iter_measurements_V(pcb_params=pcb_params, do_connect=False):
                 if self._stopping:
                     return
                 if self.ad_needs_reconnect:
                     break
-                print(errors)
+                # l = self.ad.pcb_status.list_errors(error_code=errors, inclusive_status=True)
+                # print(f"{adc_value_V[0]:0.2f}V, {int(errors):016b}, {l}")
+                IN_disable = (errors & bit_IN_disable) != 0
+                IN_t = (errors & bit_IN_t) != 0
+                print(f"{int(errors):016b} measurements={len(adc_value_V)} IN_disable={IN_disable} IN_t={IN_t}") 
                 pass
 
         return
