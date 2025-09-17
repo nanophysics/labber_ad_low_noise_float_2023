@@ -48,14 +48,14 @@ class Driver(InstrumentDriver.InstrumentWorker):
 
         logger.info(f"performSetValue({quant}, {value})")
 
-        logging_utils.performSetValue(quant)
+        successfully_set = logging_utils.performSetValue(quant, value)
+        if not successfully_set:
+            if quant.name == "Synchron":
+                synchron_text = quant.getValueString()
+                self.is_asynchron = synchron_text == "ASYNCHRON"
 
-        if quant.name == "Synchron":
-            synchron_text = quant.getValueString()
-            self.is_asynchron = synchron_text == "ASYNCHRON"
-
-        if quant.name == "Scenario":
-            self.pico.run_scenario(round(value), is_asynchron=self.is_asynchron)
+            if quant.name == "Scenario":
+                self.pico.run_scenario(round(value), is_asynchron=self.is_asynchron)
 
         return value
 

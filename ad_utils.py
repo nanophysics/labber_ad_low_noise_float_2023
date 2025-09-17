@@ -16,6 +16,5 @@ class Channel:
 CHANNELS = [
     Channel("IN_t"),
     Channel("IN_disable"),
-    Channel("IN_P"),
-    Channel("IN_N"),
+    Channel("IN_voltage"),
 ]

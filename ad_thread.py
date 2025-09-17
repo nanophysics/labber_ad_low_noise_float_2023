@@ -13,9 +13,7 @@ import ad_utils
 TICK_INTERVAL_S = 0.5
 
 logger = logging.getLogger("LabberDriver")
-
 logger_ad = logging.getLogger(LOGGER_NAME)
-logger_ad.setLevel(logging.DEBUG)
 
 LOCK = threading.Lock()
 
@@ -60,7 +58,7 @@ class AdThread(threading.Thread):
 
     def run(self):
         while True:
-            pcb_params=PcbParams(input_Vp=1.0, register_filter1=self.register_filter1)
+            pcb_params=PcbParams(input_Vp=1.0, register_filter1=self.register_filter1, resolution22=True)
             logger.info(f"connect with input_Vp={pcb_params.input_Vp:0.1f}V, SPS={self.register_filter1.name}")
             self.ad_needs_reconnect = False
             # Read the jumper settings
@@ -70,22 +68,16 @@ class AdThread(threading.Thread):
             if settings_program < REQUIRED_VERSION:
                     raise ValueError(f"Found '{settings_program}' but required at least '{REQUIRED_VERSION}'!")
                 
-            bit_IN_disable_text = self.ad.pcb_status.settings['ERROR_STATUS_J45']
-            bit_IN_t_text = self.ad.pcb_status.settings['ERROR_STATUS_J46']
-            bit_IN_disable= int(bit_IN_disable_text, 16)
-            bit_IN_t= int(bit_IN_t_text, 16)
-
-            for errors, adc_value_V in self.ad.iter_measurements_V(pcb_params=pcb_params, do_connect=False):
+            for measurements in self.ad.iter_measurements_V(pcb_params=pcb_params, do_connect=False):
                 if self._stopping:
                     return
                 if self.ad_needs_reconnect:
                     break
                 # l = self.ad.pcb_status.list_errors(error_code=errors, inclusive_status=True)
                 # print(f"{adc_value_V[0]:0.2f}V, {int(errors):016b}, {l}")
-                IN_disable = (errors & bit_IN_disable) != 0
-                IN_t = (errors & bit_IN_t) != 0
-                print(f"{int(errors):016b} measurements={len(adc_value_V)} IN_disable={IN_disable} IN_t={IN_t}") 
-                pass
+                IN_disable = int(measurements.IN_disable[0])
+                IN_t = int(measurements.IN_t[0])
+                logger_ad.debug(f"{int(measurements.errors):016b} measurements={len(measurements.adc_value_V):5d} IN_disable={IN_disable} IN_t={IN_t}") 
 
         return
         while not self._stopping:
@@ -201,13 +193,17 @@ class AdThread(threading.Thread):
 
     @synchronized
     def set_quantity(self, quant_name: str, value):
+        """
+        Returns the new value.
+        Returns None if quant.name does not match.
+        """
         if quant_name == "Sample rate SPS":
             self.register_filter1 = RegisterFilter1.factory(value)
             assert isinstance(self.register_filter1, RegisterFilter1)
             self.ad_needs_reconnect = True
             return value
         
-        return value
+        return None
 
     # def get_value(self, name: str):
     #     """
@@ -242,8 +238,6 @@ class AdThread(threading.Thread):
 def main_standalone():
     logging.basicConfig()
     logger.setLevel(logging.DEBUG)
-
-    logger_ad = logging.getLogger(LOGGER_NAME)
     logger_ad.setLevel(logging.DEBUG)
 
     adc = AdLowNoiseFloat2023()

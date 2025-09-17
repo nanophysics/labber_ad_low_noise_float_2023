@@ -27,7 +27,7 @@ It may produces signals with given timings to provoke verious reading situations
   
   bool
 
-* IN_P
+* IN_voltage
   
   float (IN_P_0V, IN_P_0V7, IN_P_3V3)
 
@@ -69,4 +69,3 @@ wait_ms(50)
 IN_t(0)
 IN_P(IN_P_0V0)
 ```
-

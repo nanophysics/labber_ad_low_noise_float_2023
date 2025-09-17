@@ -16,7 +16,7 @@ from .constants_ad_low_noise_float_2023 import ConfigStepAdLowNoiseFloat2023
 from .library_filelock import ExitCode
 from .program_fir import UniformPieces
 
-logger = logging.getLogger("logger")
+logger = logging.getLogger("LabberDriver")
 
 
 RE_STATUS_BYTE_MASK = re.compile(r"STATUS_BYTE_MASK=0x(\w+)")

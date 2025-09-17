@@ -8,7 +8,7 @@ from .constants_ad_low_noise_float_2023 import (
 )
 from .program_configsetup import ConfigSetup, ConfigStepSkip
 
-logger = logging.getLogger("logger")
+logger = logging.getLogger("LabberDriver")
 
 
 fir_count_3_slow = 30
