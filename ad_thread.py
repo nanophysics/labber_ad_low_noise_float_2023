@@ -4,6 +4,7 @@ import enum
 import logging
 import threading
 import dataclasses
+import typing
 
 import numpy as np
 
@@ -75,6 +76,35 @@ class Recorder:
         assert len(self.IN_voltage) == len(self.IN_disable)
         assert len(self.IN_voltage) == len(self.IN_t)
 
+    def IN_disable_raising_edge(self) -> typing.Optional[int]:
+        return self.find_raising_edge(self.IN_disable)
+
+    @staticmethod
+    def find_raising_edge(array_of_bool: np.ndarray) -> typing.Optional[int]:
+        """
+        Returns the first transition from 0 to 1. Returns the index of '1'.
+        Returns None if no transition found.
+
+        import numpy as np
+        >>> high_low_high = np.array([1, 1, 0, 0, 1], bool)
+        >>> low = np.nonzero(high_low_high == 0)[0]
+        >>> low
+        array([2, 3])
+        >>> low[0]
+        2
+        """
+        # Find first '0'
+        array0 = np.nonzero(array_of_bool == 0)[0]
+        if len(array0) == 0:
+            return None
+        idx0_first0 = array0[0]
+        # From this position, find first '1'
+        array1 = np.nonzero(array_of_bool[idx0_first0:])[0]
+        if len(array1) == 0:
+            return None
+        idx0_first1 = array1[0]
+        return idx0_first1
+
 
 @dataclasses.dataclass
 class Acquistion:
@@ -83,7 +113,6 @@ class Acquistion:
     time_armed_start_s: float = time.monotonic()
     done_event = threading.Event()
     lock = threading.Lock()
-
 
     def handle_timeout(self) -> bool:
         """
@@ -115,7 +144,9 @@ class Acquistion:
     def start(self, measurements: MeasurementSequence, idx0_start: int) -> None:
         with self.lock:
             self.state = State.RECORD
-            self.recorder = Recorder.start(measurements=measurements, idx0_start=idx0_start)
+            self.recorder = Recorder.start(
+                measurements=measurements, idx0_start=idx0_start
+            )
             logger.info(
                 f"{self.state.name} start({len(measurements.adc_value_V)}, idx0_start={idx0_start})"
             )
@@ -125,12 +156,28 @@ class Acquistion:
             self.recorder.append(measurements=measurements)
             logger.info(f"{self.state.name} append({len(measurements.adc_value_V)})")
 
-    def stop(self, measurements: MeasurementSequence, idx0_end: int) -> None:
+    # def stop(self, measurements: MeasurementSequence, idx0_end: int) -> None:
+    #     with self.lock:
+    #         self.state = State.IDLE
+    #         self.recorder.stop(measurements=measurements, idx0_end=idx0_end)
+    #         self._done()
+    #         logger.info(
+    #             f"{self.state.name} stop({len(measurements.adc_value_V)}, idx0_end={idx0_end})"
+    #         )
+
+    def found_raising_edge(self) -> bool:
+        idx = self.recorder.IN_disable_raising_edge()
+        if idx is None:
+            return False
+        
         with self.lock:
             self.state = State.IDLE
-            self.recorder.stop(measurements=measurements, idx0_end=idx0_end)
             self._done()
-            logger.info(f"{self.state.name} stop({len(measurements.adc_value_V)}, idx0_end={idx0_end})")
+            logger.info(
+                f"{self.state.name} stop({len(measurements.adc_value_V)}, idx0_end={idx0_end})"
+            )
+        logger.info(f"found_raising_edge idx={idx})")
+        return True
 
 
 class AdThread(threading.Thread):
@@ -161,7 +208,7 @@ class AdThread(threading.Thread):
     def run(self):
         """
         import numpy as np
-        >>> np.array([1, 1, 0, 1], np.bool)
+        >>> np.array([1, 1, 0, 1], bool)
         array([ True,  True, False,  True])
         >>> np.nonzero(a)
         (array([0, 1, 3]),)
@@ -170,7 +217,7 @@ class AdThread(threading.Thread):
         >>> np.nonzero(a == 0)
         (array([2]),)
 
-        >>> b = np.array([0, 0, 0, 0], np.bool)
+        >>> b = np.array([0, 0, 0, 0], bool)
         >>> np.nonzero(b == 1)
         (array([], dtype=int64),)
         >>> len(y[0])
@@ -202,14 +249,13 @@ class AdThread(threading.Thread):
                     break
 
                 def handle_state(measurements: MeasurementSequence) -> None:
+
                     if self._aquisition.state is State.ARMED:
-                        logger.info(
-                                    "TODO REMOVE handle_state(ARMED)"
-                                )
+                        logger.info("TODO REMOVE handle_state(ARMED)")
                         self._aquisition.start(
-                                measurements=measurements,
-                                idx0_start=self.ad.decoder.size(),
-                            )
+                            measurements=measurements,
+                            idx0_start=self.ad.decoder.size(),
+                        )
                         if False:
                             array_idx0_enabled = np.nonzero(measurements.IN_disable)[0]
                             if len(array_idx0_enabled) == 0:
@@ -220,18 +266,24 @@ class AdThread(threading.Thread):
                                 return
                             idx0_enabled = array_idx0_enabled[0]
                             self._aquisition.start(
-                                    measurements=measurements,
-                                    idx0_start=idx0_enabled,
-                                )
+                                measurements=measurements,
+                                idx0_start=idx0_enabled,
+                            )
                         return
 
                     if self._aquisition.state is State.RECORD:
+                        self._aquisition.append(measurements=measurements)
+                        if self._aquisition.found_raising_edge():
+                            return
+                        self._aquisition.handle_timeout()
+                        return
                         array_idx0_disabled = np.nonzero(measurements.IN_disable == 0)[
                             0
                         ]
                         if len(array_idx0_disabled) == 0:
                             self._aquisition.append(measurements=measurements)
                             self._aquisition.handle_timeout()
+                            self._aquisition.found_raising_edge()
                             return
 
                         idx0_disabled = array_idx0_disabled[0]

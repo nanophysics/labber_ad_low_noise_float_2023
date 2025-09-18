@@ -11,18 +11,14 @@
 
 ```mermaid
 stateDiagram-v2
-    i: Idle (IN_xx is ready to be read by Labber)
-    a: Armed
-    r: Record
+    a: ARMED (IN_xx is ready to be read by Labber)
+    c: CAPTURING
 
-    [*] --> i
-    i --> a: Labber driver 'isFirstCall'
-    a --> r: enabled (IN_disable is low, eg. IN_disable is not connected)
-    r --> i: disabled (IN_disable is high)
-    r --> i: Timeout "duration max s"
-    a --> i: Timeout "duration max s"
-    i --> i: Labber performGetValue(IN_xx) - NOT 'isFirstCall'
-    i --> a: Labber performGetValue(IN_xx) - 'isFirstCall'
+    [*] --> a
+    c --> a: raising edge withing 'IN_disable'
+    c --> a: Timeout "duration max s"
+    a --> a: Labber performGetValue(IN_xx) - NOT 'isFirstCall'
+    a --> c: Labber performGetValue(IN_xx) - 'isFirstCall'
 ```
 
 When the Labber Measurement reads the first `IN_xx` (isFirstCall) it will trigger the states `Armed` -> `Record` -> `Idle`.
