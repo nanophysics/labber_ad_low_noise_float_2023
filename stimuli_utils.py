@@ -63,6 +63,7 @@ class PicoStimuli:
     def run_scenario(self, scenario: int, is_asynchron: bool) -> None:
         filename = DIRECTORY_MICROPYTHON / f"scenario_{scenario:02d}.py"
         logger.info(f"run_scenario({scenario})")
+        
         if not filename.is_file():
             msg = f"Scenario does not exist: {filename}"
             logger.error(msg)

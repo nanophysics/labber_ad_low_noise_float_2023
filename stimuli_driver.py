@@ -46,7 +46,7 @@ class Driver(InstrumentDriver.InstrumentWorker):
         return the actual value set by the instrument"""
         # just return the value
 
-        logger.info(f"performSetValue({quant}, {value})")
+        logger.info(f"performSetValue({quant.name}, {value})")
 
         successfully_set = logging_utils.performSetValue(quant, value)
         if not successfully_set:
