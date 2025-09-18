@@ -1,3 +1,3 @@
 # prepare crash
-def scenario():
+def scenario(ctx):
     1/0

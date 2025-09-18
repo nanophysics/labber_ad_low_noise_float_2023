@@ -1,21 +1,21 @@
-def scenario():
+def scenario(ctx):
     time_ms=500
 
-    IN_disable(0)
-    IN_P(IN_P_0V7)
+    ctx.IN_disable(0)
+    ctx.IN_P_0V7()
 
-    wait_ms(time_ms)
+    ctx.wait_ms(time_ms)
     
-    IN_t(0)
-    IN_P(IN_P_1V4)
+    ctx.IN_t(0)
+    ctx.IN_P_1V4()
 
-    wait_ms(time_ms)
+    ctx.wait_ms(time_ms)
 
-    IN_disable(1)
-    IN_P(IN_P_0V0)
+    ctx.IN_disable(1)
+    ctx.IN_P_0V0()
 
-    wait_ms(time_ms)
+    ctx.wait_ms(time_ms)
     
-    IN_t(1)
-    IN_P(IN_P_1V4)
+    ctx.IN_t(1)
+    ctx.IN_P_1V4()
 

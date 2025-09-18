@@ -2,7 +2,26 @@
 
 ## Features
 
-* 
+TODO
+
+## Triggers
+
+Terms related to `IN_disable` and `IN_t`:
+
+* `True`, `False` is used for logical state.
+* `0V` and `3V3` is used for electrical state.
+* `ERROR_STATUS_J44` in the python driver is the logical state.
+
+Pins
+
+* IN_disable, J45
+* IN_t, J46
+
+BNC and Jumper
+
+* In BNC is NOT connected: `IN_disable` and `IN_t` are `False`.
+* On PCB J45/J46: `0` corresponds to `True`
+* Setting a Jumper on J54/J46 corresponds to `True`
 
 ## Trigger mechanism
 

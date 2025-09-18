@@ -1,5 +1,5 @@
 # prepare disable high
-def scenario():
-    IN_disable(1)
-    IN_t(0)
-    IN_P(IN_P_0V7)
+def scenario(ctx):
+    ctx.IN_disable(1)
+    ctx.IN_t(0)
+    ctx.IN_P_0V7()

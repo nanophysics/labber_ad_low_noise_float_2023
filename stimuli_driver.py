@@ -5,7 +5,7 @@ C:\Program Files\Labber\Drivers\Examples\SimpleSignalGenerator
 
 import sys
 import logging
-import numpy as np
+import enum
 
 import InstrumentDriver
 
@@ -18,6 +18,7 @@ logging.basicConfig()
 logger.setLevel(logging.DEBUG)
 
 print(sys.version_info)
+stimuli_utils.assert_correct_python_version()
 
 
 class Driver(InstrumentDriver.InstrumentWorker):
@@ -27,7 +28,8 @@ class Driver(InstrumentDriver.InstrumentWorker):
         super().__init__(*args, **kwargs)
 
         self.pico: stimuli_utils.PicoStimuli | None = None
-        self.is_asynchron: bool = True
+        self.run_synchron: bool = False
+        self.do_validate: bool = False
 
     def performOpen(self, options={}):
         """Perform the operation of opening the instrument connection"""
@@ -46,18 +48,40 @@ class Driver(InstrumentDriver.InstrumentWorker):
         return the actual value set by the instrument"""
         # just return the value
 
-        logger.info(f"performSetValue({quant.name}, {value})")
+        logger.info(f"performSetValue('{quant.name}', {value})")
 
         successfully_set = logging_utils.performSetValue(quant, value)
-        if not successfully_set:
-            if quant.name == "Synchron":
-                synchron_text = quant.getValueString()
-                self.is_asynchron = synchron_text == "ASYNCHRON"
+        if successfully_set:
+            return value
 
-            if quant.name == "Scenario":
-                self.pico.run_scenario(round(value), is_asynchron=self.is_asynchron)
+        if quant.name == "Synchron":
+            synchron_text = quant.getValueString()
+            if synchron_text == "ASYNCHRON":
+                self.run_synchron = False
+                self.do_validate = False
+            elif synchron_text == "SYNCHRON_DEBUG":
+                self.run_synchron = True
+                self.do_validate = False
+            elif synchron_text == "VALIDATE_DEBUG":
+                self.run_synchron = True
+                self.do_validate = True
+            else:
+                assert False, synchron_text
+            return value
 
-        return value
+        if quant.name == "Scenario":
+            self.pico.run_scenario(
+                scenario=round(value),
+                run_synchron=self.run_synchron,
+                do_validate=self.do_validate,
+            )
+            return value
+
+        if quant.name == "Logging":
+            logger.info("Logging severity not implemented yet")
+            return value
+
+        raise ValueError(f"Unknown quant.name '{quant.name}'!")
 
     def performGetValue(self, quant, options={}):
         """Perform the Get Value instrument operation"""

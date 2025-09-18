@@ -1,4 +1,4 @@
 # Scenario: Silence
 
-def scenario():
+def scenario(ctx):
     pass
