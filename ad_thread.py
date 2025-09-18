@@ -2,10 +2,9 @@ from __future__ import annotations
 import time
 import enum
 import logging
-import typing
 import threading
 import dataclasses
-import queue
+
 import numpy as np
 
 from ad_low_noise_float_2023.ad import (
@@ -16,15 +15,12 @@ from ad_low_noise_float_2023.ad import (
 from ad_low_noise_float_2023.constants import PcbParams, RegisterFilter1
 from ad_utils import CHANNEL_VOLTAGE, CHANNEL_T, CHANNEL_DISABLE
 
-import ad_utils
-
 TICK_INTERVAL_S = 0.5
 
 logger = logging.getLogger("LabberDriver")
 logger_ad = logging.getLogger(LOGGER_NAME)
 
 LOCK = threading.Lock()
-ACQUISITION_QUEUE = queue.Queue(maxsize=1)
 
 
 class State(enum.IntEnum):
@@ -47,12 +43,15 @@ def synchronized(func):
 
 @dataclasses.dataclass
 class Recorder:
-    IN_voltage: list[np.array]
-    IN_disable: list[np.array]
-    IN_t: list[np.array]
+    IN_voltage: list[np.array] = None
+    # dataclasses.field(        default_factory=lambda: [np.array([], dtype=bool)]    )
+    IN_disable: list[np.array] = None
+    # dataclasses.field(        default_factory=lambda: [np.array([], dtype=bool)]    )
+    IN_t: list[np.array] = None
+    # dataclasses.field(        default_factory=lambda: [np.array([], dtype=float)]    )
 
     @staticmethod
-    def start(measurements: MeasurementSequence, idx0_start: int) -> True:
+    def start(measurements: MeasurementSequence, idx0_start: int) -> Recorder:
         return Recorder(
             IN_voltage=measurements.adc_value_V[idx0_start:],
             IN_disable=measurements.IN_disable[idx0_start:],
@@ -64,13 +63,75 @@ class Recorder:
         self.IN_disable = np.concatenate((self.IN_disable, measurements.IN_disable))
         self.IN_t = np.concatenate((self.IN_t, measurements.IN_t))
 
-    def stop(self,measurements: MeasurementSequence, idx0_end: int) -> None:
-        self.IN_voltage = np.concatenate((self.IN_voltage, measurements.adc_value_V[:idx0_end]))
-        self.IN_disable = np.concatenate((self.IN_disable, measurements.IN_disable[:idx0_end]))
+    def stop(self, measurements: MeasurementSequence, idx0_end: int) -> None:
+        self.IN_voltage = np.concatenate(
+            (self.IN_voltage, measurements.adc_value_V[:idx0_end])
+        )
+        self.IN_disable = np.concatenate(
+            (self.IN_disable, measurements.IN_disable[:idx0_end])
+        )
         self.IN_t = np.concatenate((self.IN_t, measurements.IN_t[:idx0_end]))
 
         assert len(self.IN_voltage) == len(self.IN_disable)
         assert len(self.IN_voltage) == len(self.IN_t)
+
+
+@dataclasses.dataclass
+class Acquistion:
+    state: State = State.IDLE
+    recorder: Recorder | None = None
+    time_armed_start_s: float = time.monotonic()
+    done_event = threading.Event()
+    lock = threading.Lock()
+
+
+    def handle_timeout(self) -> bool:
+        """
+        Return True if timeout is over
+        """
+        duration_s = time.monotonic() - self.time_armed_start_s
+        if duration_s > 5.0:
+            logger.info(f"Timeout={duration_s:0.1f}s")
+            self._done()
+            return True
+        return False
+
+    def _done(self) -> None:
+        self.done_event.set()
+        self.state = State.IDLE
+
+    def wait_for_acquisition(self) -> None:
+        """
+        We capture a new shot.
+        Reset the last shot and get ready.
+        """
+        with self.lock:
+            self.recorder = Recorder()
+            self.time_armed_start_s: float = time.monotonic()
+            self.state = State.ARMED
+            self.done_event.clear()
+        self.done_event.wait()
+
+    def start(self, measurements: MeasurementSequence, idx0_start: int) -> None:
+        with self.lock:
+            self.state = State.RECORD
+            self.recorder = Recorder.start(measurements=measurements, idx0_start=idx0_start)
+            logger.info(
+                f"{self.state.name} start({len(measurements.adc_value_V)}, idx0_start={idx0_start})"
+            )
+
+    def append(self, measurements: MeasurementSequence) -> None:
+        with self.lock:
+            self.recorder.append(measurements=measurements)
+            logger.info(f"{self.state.name} append({len(measurements.adc_value_V)})")
+
+    def stop(self, measurements: MeasurementSequence, idx0_end: int) -> None:
+        with self.lock:
+            self.state = State.IDLE
+            self.recorder.stop(measurements=measurements, idx0_end=idx0_end)
+            self._done()
+            logger.info(f"{self.state.name} stop({len(measurements.adc_value_V)}, idx0_end={idx0_end})")
+
 
 class AdThread(threading.Thread):
     """
@@ -93,10 +154,9 @@ class AdThread(threading.Thread):
         self.ad = AdLowNoiseFloat2023()
         self.register_filter1: RegisterFilter1 = RegisterFilter1.SPS_97656
         self.ad_needs_reconnect: bool = False
-
+        self._aquisition = Acquistion()
         self._stopping = False
-        self._state: State = State.IDLE
-        self._recorder: Recorder | None = None
+        self.duration_max_s = 5.0
 
     def run(self):
         """
@@ -142,32 +202,46 @@ class AdThread(threading.Thread):
                     break
 
                 def handle_state(measurements: MeasurementSequence) -> None:
-                    if self._state == State.ARMED:
-                        array_idx0_enabled = np.nonzero(measurements.IN_disable)[0]
-                        if len(array_idx0_enabled) == 0:
-                            return
-                        idx0_enabled = array_idx0_enabled[0]
-                        self._state = State.RECORD
-                        self._recorder = Recorder.start(
-                            measurements=measurements, idx0_start=idx0_enabled
-                        )
-                        print(f"{self._state.name} idx0_enabled={idx0_enabled}")
+                    if self._aquisition.state is State.ARMED:
+                        logger.info(
+                                    "TODO REMOVE handle_state(ARMED)"
+                                )
+                        self._aquisition.start(
+                                measurements=measurements,
+                                idx0_start=self.ad.decoder.size(),
+                            )
+                        if False:
+                            array_idx0_enabled = np.nonzero(measurements.IN_disable)[0]
+                            if len(array_idx0_enabled) == 0:
+                                logger.info(
+                                    f"TODO REMOVE array_idx0_enabled={array_idx0_enabled}"
+                                )
+                                self._aquisition.handle_timeout()
+                                return
+                            idx0_enabled = array_idx0_enabled[0]
+                            self._aquisition.start(
+                                    measurements=measurements,
+                                    idx0_start=idx0_enabled,
+                                )
+                        return
 
-                    elif self._state == State.RECORD:
+                    if self._aquisition.state is State.RECORD:
                         array_idx0_disabled = np.nonzero(measurements.IN_disable == 0)[
                             0
                         ]
                         if len(array_idx0_disabled) == 0:
-                            self._recorder.append(measurements=measurements)
+                            self._aquisition.append(measurements=measurements)
+                            self._aquisition.handle_timeout()
                             return
+
                         idx0_disabled = array_idx0_disabled[0]
-                        self._state = State.IDLE
-                        self._recorder.stop(measurements=measurements, idx0_end=idx0_disabled)
-                        print(f"{self._state.name} idx0_enabled={idx0_disabled}")
-                        ACQUISITION_QUEUE.put("Done")
+                        self._aquisition.stop(
+                            measurements=measurements,
+                            idx0_end=idx0_disabled,
+                        )
 
                 handle_state(measurements)
-                logger.info(f"TODO REMOVE handle_state({self._state})")
+                logger.info(f"TODO REMOVE handle_state({self._aquisition.state.name})")
 
                 # l = self.ad.pcb_status.list_errors(error_code=errors, inclusive_status=True)
                 # print(f"{adc_value_V[0]:0.2f}V, {int(errors):016b}, {l}")
@@ -207,32 +281,17 @@ class AdThread(threading.Thread):
         # self.dict_values_labber_thread_copy = self._visa_station.dict_values.copy()
 
     @synchronized
-    def get_gain_from_jumpers_V(self) -> float:
-        return self.ad.pcb_status.gain_from_jumpers
-
-    @synchronized
-    def wait_measurements(self, dict_channels: typing.Dict[str, ad_utils.Channel]) -> None:
+    def wait_measurements(self) -> None:
         """
         This method will until the measurements are acquired.
         """
         logger.info("TODO REMOVE wait_measurements() A")
-
-        while ACQUISITION_QUEUE.full():
-            ACQUISITION_QUEUE.get()
-
-        logger.info("TODO REMOVE wait_measurements() B")
-
-        self._state = State.ARMED
-        # self._recorder = None
-
-        # while self._state != State.IDLE:
-        #     time.sleep(0.01)
-        ACQUISITION_QUEUE.get()
+        self._aquisition.wait_for_acquisition()
         logger.info("TODO REMOVE wait_measurements() C")
 
-        CHANNEL_DISABLE.data = self._recorder.IN_disable
-        CHANNEL_T.data = self._recorder.IN_t
-        CHANNEL_VOLTAGE.data = self._recorder.IN_voltage
+        CHANNEL_DISABLE.data = self._aquisition.recorder.IN_disable
+        CHANNEL_T.data = self._aquisition.recorder.IN_t
+        CHANNEL_VOLTAGE.data = self._aquisition.recorder.IN_voltage
         # dict_channels[]
         # for idx, channel in enumerate(dict_channels.values()):
         #     channel.data = np.array([1.0 * idx + i * 0.001 for i in range(12)])
@@ -304,7 +363,7 @@ class AdThread(threading.Thread):
     #     return heater_wrapper.TEMPERATURE_SETTLE_OFF_K
 
     @synchronized
-    def set_quantity(self, quant_name: str, value):
+    def set_quantity_sync(self, quant_name: str, value):
         """
         Returns the new value.
         Returns None if quant.name does not match.
@@ -315,6 +374,21 @@ class AdThread(threading.Thread):
             self.ad_needs_reconnect = True
             return value
 
+        if quant_name == "duration max s":
+            value = max(0.001, value)
+            value = min(1000, value)
+            self.duration_max_s = value
+            return value
+
+        return None
+
+    @synchronized
+    def get_quantity_sync(self, quant):
+        if quant.name == "Input range":
+            return self.ad.pcb_status.gain_from_jumpers
+
+        if quant.name == "duration max s":
+            return self.duration_max_s
         return None
 
     # def get_value(self, name: str):

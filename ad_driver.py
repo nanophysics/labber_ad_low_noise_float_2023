@@ -64,7 +64,7 @@ class Driver(InstrumentDriver.InstrumentWorker):
 
         new_value = logging_utils.performSetValue(quant, value)
         if new_value is None:
-            new_value = self._thread.set_quantity(quant_name=quant.name, value=value)
+            new_value = self._thread.set_quantity_sync(quant_name=quant.name, value=value)
             if new_value is None:
                 logger.warning(f"Nobody was setting '{quant.name}'...")
 
@@ -85,8 +85,9 @@ class Driver(InstrumentDriver.InstrumentWorker):
         first_call = "FIRST" if isFirstCall else ""
         logger.info(f"performGetValue('{quant.name}') {first_call}")
 
-        if quant.name == "Input range":
-            return self._thread.get_gain_from_jumpers_V()
+        value = self._thread.get_quantity_sync(quant)
+        if value is not None:
+            return value
         
         channel = self.dict_channels.get(quant.name, None)
         if channel is not None:
@@ -104,19 +105,21 @@ class Driver(InstrumentDriver.InstrumentWorker):
         """Resample the data"""
 
         logger.info("TODO REMOVE wait_measurements() ENTERING")
-        self._thread.wait_measurements(self.dict_channels)
+        self._thread.wait_measurements()
         logger.info("TODO REMOVE wait_measurements() LEAVING")
+        return
+
         # logger.info("Sleep 7s")
         # time.sleep(7)
         
         # duration_max_s = float(self.getValue("duration max s"))
         # sample_rate_sps_text = self.getValue("Sample rate SPS")
-        # sample_rate_sps = 97656  # TODO
+        sample_rate_sps = 97656  # TODO
         # sample_count = int(duration_max_s * sample_rate_sps)
 
-        # for idx, channel in enumerate(self.dict_channels.values()):
-        #     channel.data = np.array(
-        #         [1.0 * idx + i * 0.001 for i in range(sample_count)]
-        #     )
+        for idx, channel in enumerate(self.dict_channels.values()):
+            channel.data = np.array(
+                [1.0 * idx + i * 0.001 for i in range(sample_count)]
+            )
 
         # self.dt = 1.0 / sample_rate_sps
