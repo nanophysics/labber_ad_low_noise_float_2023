@@ -72,9 +72,9 @@ class PicoStimuli:
         self._execfile(filename)
 
         if is_asynchron:
-            self._exec_raw('scenario_on_second_thread()')
+            self._exec_raw('run_scenario_on_second_thread()')
         else:
-            self._exec_raw('scenario()')
+            self._exec_raw('run_scenario()')
 
     def close(self):
         self.board.close()

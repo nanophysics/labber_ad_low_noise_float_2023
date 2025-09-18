@@ -69,3 +69,13 @@ wait_ms(50)
 IN_t(0)
 IN_P(IN_P_0V0)
 ```
+
+## Run scenarios from the command line
+
+```bash
+cd stimuli_src_micropython
+uvx mpremote run init.py
+uvx mpremote resume run scenario_07.py exec 'run_scenario()'
+```
+
+There is no feedback on the terminal.

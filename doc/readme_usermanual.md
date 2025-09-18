@@ -6,19 +6,28 @@
 
 ## Trigger mechanism
 
+`IN_xx` stands for `IN_voltage, IN_disable and IN_t`
+
+
 ```mermaid
 stateDiagram-v2
-    tc: Trace captured
+    i: Idle (IN_xx is ready to be read by Labber)
     a: Armed
     r: Record
 
-    [*] --> a
-    a --> r: enabled (IN_disable is low, eg. not connected)
-    r --> tc: disabled (IN_disable is high)
-    r --> tc: Timeout "duration max s"
-    r --> tc: Timeout "duration max s"
-    tc --> a: Labber experiment reads IN_voltage, IN_disable or IN_t
+    [*] --> i
+    i --> a: Labber driver 'isFirstCall'
+    a --> r: enabled (IN_disable is low, eg. IN_disable is not connected)
+    r --> i: disabled (IN_disable is high)
+    r --> i: Timeout "duration max s"
+    a --> i: Timeout "duration max s"
+    i --> i: Labber performGetValue(IN_xx) - NOT 'isFirstCall'
+    i --> a: Labber performGetValue(IN_xx) - 'isFirstCall'
 ```
+
+When the Labber Measurement reads the first `IN_xx` (isFirstCall) it will trigger the states `Armed` -> `Record` -> `Idle`.
+
+When the data is ready, the result and the control will be returned to Labber.
 
 ## Labber Instrument Settings
 

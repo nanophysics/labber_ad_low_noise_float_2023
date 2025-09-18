@@ -1,12 +1,20 @@
 from __future__ import annotations
 import time
+import enum
 import logging
 import typing
 import threading
+import dataclasses
+import queue
 import numpy as np
 
-from ad_low_noise_float_2023.ad import AdLowNoiseFloat2023, LOGGER_NAME
+from ad_low_noise_float_2023.ad import (
+    AdLowNoiseFloat2023,
+    LOGGER_NAME,
+    MeasurementSequence,
+)
 from ad_low_noise_float_2023.constants import PcbParams, RegisterFilter1
+from ad_utils import CHANNEL_VOLTAGE, CHANNEL_T, CHANNEL_DISABLE
 
 import ad_utils
 
@@ -16,6 +24,13 @@ logger = logging.getLogger("LabberDriver")
 logger_ad = logging.getLogger(LOGGER_NAME)
 
 LOCK = threading.Lock()
+ACQUISITION_QUEUE = queue.Queue(maxsize=1)
+
+
+class State(enum.IntEnum):
+    IDLE = enum.auto()
+    ARMED = enum.auto()
+    RECORD = enum.auto()
 
 
 def synchronized(func):
@@ -29,6 +44,33 @@ def synchronized(func):
 
     return wrapper
 
+
+@dataclasses.dataclass
+class Recorder:
+    IN_voltage: list[np.array]
+    IN_disable: list[np.array]
+    IN_t: list[np.array]
+
+    @staticmethod
+    def start(measurements: MeasurementSequence, idx0_start: int) -> True:
+        return Recorder(
+            IN_voltage=measurements.adc_value_V[idx0_start:],
+            IN_disable=measurements.IN_disable[idx0_start:],
+            IN_t=measurements.IN_t[idx0_start:],
+        )
+
+    def append(self, measurements: MeasurementSequence) -> None:
+        self.IN_voltage = np.concatenate((self.IN_voltage, measurements.adc_value_V))
+        self.IN_disable = np.concatenate((self.IN_disable, measurements.IN_disable))
+        self.IN_t = np.concatenate((self.IN_t, measurements.IN_t))
+
+    def stop(self,measurements: MeasurementSequence, idx0_end: int) -> None:
+        self.IN_voltage = np.concatenate((self.IN_voltage, measurements.adc_value_V[:idx0_end]))
+        self.IN_disable = np.concatenate((self.IN_disable, measurements.IN_disable[:idx0_end]))
+        self.IN_t = np.concatenate((self.IN_t, measurements.IN_t[:idx0_end]))
+
+        assert len(self.IN_voltage) == len(self.IN_disable)
+        assert len(self.IN_voltage) == len(self.IN_t)
 
 class AdThread(threading.Thread):
     """
@@ -49,56 +91,106 @@ class AdThread(threading.Thread):
         self.dict_values_labber_thread_copy = {}
         super().__init__(daemon=True)
         self.ad = AdLowNoiseFloat2023()
-        self.register_filter1: RegisterFilter1 = RegisterFilter1.SPS_03052
+        self.register_filter1: RegisterFilter1 = RegisterFilter1.SPS_97656
         self.ad_needs_reconnect: bool = False
 
         self._stopping = False
-        self.start()
-
+        self._state: State = State.IDLE
+        self._recorder: Recorder | None = None
 
     def run(self):
+        """
+        import numpy as np
+        >>> np.array([1, 1, 0, 1], np.bool)
+        array([ True,  True, False,  True])
+        >>> np.nonzero(a)
+        (array([0, 1, 3]),)
+        >>> np.nonzero(a == 1)
+        (array([0, 1, 3]),)
+        >>> np.nonzero(a == 0)
+        (array([2]),)
+
+        >>> b = np.array([0, 0, 0, 0], np.bool)
+        >>> np.nonzero(b == 1)
+        (array([], dtype=int64),)
+        >>> len(y[0])
+        0
+        """
         while True:
-            pcb_params=PcbParams(input_Vp=1.0, register_filter1=self.register_filter1, resolution22=True)
-            logger.info(f"connect with input_Vp={pcb_params.input_Vp:0.1f}V, SPS={self.register_filter1.name}")
+            pcb_params = PcbParams(
+                input_Vp=1.0, register_filter1=self.register_filter1, resolution22=True
+            )
+            logger.info(
+                f"connect with input_Vp={pcb_params.input_Vp:0.1f}V, SPS={self.register_filter1.name}"
+            )
             self.ad_needs_reconnect = False
             # Read the jumper settings
             self.ad.connect(pcb_params=pcb_params)
-            settings_program = self.ad.pcb_status.settings['PROGRAM']
-            REQUIRED_VERSION  = 'ad_low_noise_float_2023(0.3.6)'
+            settings_program = self.ad.pcb_status.settings["PROGRAM"]
+            REQUIRED_VERSION = "ad_low_noise_float_2023(0.3.6)"
             if settings_program < REQUIRED_VERSION:
-                    raise ValueError(f"Found '{settings_program}' but required at least '{REQUIRED_VERSION}'!")
-                
-            for measurements in self.ad.iter_measurements_V(pcb_params=pcb_params, do_connect=False):
+                raise ValueError(
+                    f"Found '{settings_program}' but required at least '{REQUIRED_VERSION}'!"
+                )
+
+            for measurements in self.ad.iter_measurements_V(
+                pcb_params=pcb_params, do_connect=False
+            ):
                 if self._stopping:
                     return
                 if self.ad_needs_reconnect:
                     break
+
+                def handle_state(measurements: MeasurementSequence) -> None:
+                    if self._state == State.ARMED:
+                        array_idx0_enabled = np.nonzero(measurements.IN_disable)[0]
+                        if len(array_idx0_enabled) == 0:
+                            return
+                        idx0_enabled = array_idx0_enabled[0]
+                        self._state = State.RECORD
+                        self._recorder = Recorder.start(
+                            measurements=measurements, idx0_start=idx0_enabled
+                        )
+                        print(f"{self._state.name} idx0_enabled={idx0_enabled}")
+
+                    elif self._state == State.RECORD:
+                        array_idx0_disabled = np.nonzero(measurements.IN_disable == 0)[
+                            0
+                        ]
+                        if len(array_idx0_disabled) == 0:
+                            self._recorder.append(measurements=measurements)
+                            return
+                        idx0_disabled = array_idx0_disabled[0]
+                        self._state = State.IDLE
+                        self._recorder.stop(measurements=measurements, idx0_end=idx0_disabled)
+                        print(f"{self._state.name} idx0_enabled={idx0_disabled}")
+                        ACQUISITION_QUEUE.put("Done")
+
+                handle_state(measurements)
+                logger.info(f"TODO REMOVE handle_state({self._state})")
+
                 # l = self.ad.pcb_status.list_errors(error_code=errors, inclusive_status=True)
                 # print(f"{adc_value_V[0]:0.2f}V, {int(errors):016b}, {l}")
-                IN_disable = int(measurements.IN_disable[0])
-                IN_t = int(measurements.IN_t[0])
-                logger_ad.debug(f"{int(measurements.errors):016b} measurements={len(measurements.adc_value_V):5d} IN_disable={IN_disable} IN_t={IN_t}") 
+                if False:
+                    IN_disable = int(measurements.IN_disable[0])
+                    IN_t = int(measurements.IN_t[0])
+                    logger_ad.debug(
+                        f"{int(measurements.errors):016b} measurements={len(measurements.adc_value_V):5d} IN_disable={IN_disable} IN_t={IN_t}"
+                    )
 
-        return
-        while not self._stopping:
-            start_s = time.time()
-            try:
-                self._tick()
-            except ad_utils.DriverAbortException as ex:
-                logger.error(f"ad_utils.DriverAbortException(): {ex}")
-                logger.exception(ex)
-                raise
-
-            except Exception as ex:
-                # Log the error but keep running
-                logger.exception(ex)
-
-            elapsed_s = time.time() - start_s
-            if elapsed_s > TICK_INTERVAL_S:
-                logger.warning(
-                    f"tick() took:{elapsed_s:0.3f}s. Expected <= {TICK_INTERVAL_S:0.3f}s"
+                error_codes = self.ad.pcb_status.list_errors(
+                    error_code=measurements.errors, inclusive_status=True
                 )
-            time.sleep(TICK_INTERVAL_S)
+                elements = []
+                elements.append(f"{measurements.adc_value_V[-1]:0.2f}V")
+                elements.append(f"{len(measurements.adc_value_V)}")
+                if measurements.IN_disable is not None:
+                    elements.append(f"IN_disable={measurements.IN_disable[-1]}")
+                if measurements.IN_t is not None:
+                    elements.append(f"IN_t={measurements.IN_t[-1]}")
+                elements.append(f"{int(measurements.errors):016b}")
+                elements.append(f"{error_codes}")
+                print(" ".join(elements))
 
     def stop(self):
         self._stopping = True
@@ -119,11 +211,31 @@ class AdThread(threading.Thread):
         return self.ad.pcb_status.gain_from_jumpers
 
     @synchronized
-    def wait_trigger(self, dict_channels: typing.Dict[str, ad_utils.Channel]) -> None:
-        for idx, channel in enumerate(dict_channels.values()):
-            channel.data = np.array(
-                [1.0 * idx + i * 0.001 for i in range(12)]
-            )
+    def wait_measurements(self, dict_channels: typing.Dict[str, ad_utils.Channel]) -> None:
+        """
+        This method will until the measurements are acquired.
+        """
+        logger.info("TODO REMOVE wait_measurements() A")
+
+        while ACQUISITION_QUEUE.full():
+            ACQUISITION_QUEUE.get()
+
+        logger.info("TODO REMOVE wait_measurements() B")
+
+        self._state = State.ARMED
+        # self._recorder = None
+
+        # while self._state != State.IDLE:
+        #     time.sleep(0.01)
+        ACQUISITION_QUEUE.get()
+        logger.info("TODO REMOVE wait_measurements() C")
+
+        CHANNEL_DISABLE.data = self._recorder.IN_disable
+        CHANNEL_T.data = self._recorder.IN_t
+        CHANNEL_VOLTAGE.data = self._recorder.IN_voltage
+        # dict_channels[]
+        # for idx, channel in enumerate(dict_channels.values()):
+        #     channel.data = np.array([1.0 * idx + i * 0.001 for i in range(12)])
 
     # @synchronized
     # def set_quantity_sync(self, quantity: Quantity, value):
@@ -202,7 +314,7 @@ class AdThread(threading.Thread):
             assert isinstance(self.register_filter1, RegisterFilter1)
             self.ad_needs_reconnect = True
             return value
-        
+
         return None
 
     # def get_value(self, name: str):
@@ -240,13 +352,16 @@ def main_standalone():
     logger.setLevel(logging.DEBUG)
     logger_ad.setLevel(logging.DEBUG)
 
-    adc = AdLowNoiseFloat2023()
+    thread = AdThread()
+    thread.run()
+    # adc = AdLowNoiseFloat2023()
 
-    pcb_params=PcbParams(input_Vp=1.0)
+    # pcb_params=PcbParams(input_Vp=1.0)
 
-    for _adc_value_V in adc.iter_measurements_V(pcb_params=pcb_params):
-        pass
-        # print(len(_adc_value_V))
+    # for _adc_value_V in adc.iter_measurements_V(pcb_params=pcb_params):
+    #     pass
+    #     # print(len(_adc_value_V))
+
 
 if __name__ == "__main__":
     main_standalone()

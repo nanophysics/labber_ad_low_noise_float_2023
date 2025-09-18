@@ -47,6 +47,7 @@ class Driver(InstrumentDriver.InstrumentWorker):
         # station = AMI430_driver_config.get_station()
         assert self._thread is None
         self._thread = ad_thread.AdThread()
+        self._thread.start()
 
     def performClose(self, bError=False, options={}):
         """Perform the close instrument connection operation"""
@@ -102,9 +103,11 @@ class Driver(InstrumentDriver.InstrumentWorker):
     def wait_trigger(self):
         """Resample the data"""
 
-        self._thread.wait_trigger(self.dict_channels)
-        logger.info("Sleep 7s")
-        time.sleep(7)
+        logger.info("TODO REMOVE wait_measurements() ENTERING")
+        self._thread.wait_measurements(self.dict_channels)
+        logger.info("TODO REMOVE wait_measurements() LEAVING")
+        # logger.info("Sleep 7s")
+        # time.sleep(7)
         
         # duration_max_s = float(self.getValue("duration max s"))
         # sample_rate_sps_text = self.getValue("Sample rate SPS")
