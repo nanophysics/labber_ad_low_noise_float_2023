@@ -25,9 +25,8 @@ LOCK = threading.Lock()
 
 
 class State(enum.IntEnum):
-    IDLE = enum.auto()
     ARMED = enum.auto()
-    RECORD = enum.auto()
+    CAPTURING = enum.auto()
 
 
 def synchronized(func):
@@ -43,17 +42,20 @@ def synchronized(func):
 
 
 @dataclasses.dataclass
-class Recorder:
-    IN_voltage: list[np.array] = None
-    # dataclasses.field(        default_factory=lambda: [np.array([], dtype=bool)]    )
-    IN_disable: list[np.array] = None
-    # dataclasses.field(        default_factory=lambda: [np.array([], dtype=bool)]    )
-    IN_t: list[np.array] = None
-    # dataclasses.field(        default_factory=lambda: [np.array([], dtype=float)]    )
+class Capturer:
+    IN_voltage: list[np.array] = dataclasses.field(
+        default_factory=lambda: np.array([], dtype=bool)
+    )
+    IN_disable: list[np.array] = dataclasses.field(
+        default_factory=lambda: np.array([], dtype=bool)
+    )
+    IN_t: list[np.array] = dataclasses.field(
+        default_factory=lambda: np.array([], dtype=float)
+    )
 
     @staticmethod
-    def start(measurements: MeasurementSequence, idx0_start: int) -> Recorder:
-        return Recorder(
+    def start(measurements: MeasurementSequence, idx0_start: int) -> Capturer:
+        return Capturer(
             IN_voltage=measurements.adc_value_V[idx0_start:],
             IN_disable=measurements.IN_disable[idx0_start:],
             IN_t=measurements.IN_t[idx0_start:],
@@ -108,8 +110,8 @@ class Recorder:
 
 @dataclasses.dataclass
 class Acquistion:
-    state: State = State.IDLE
-    recorder: Recorder | None = None
+    state: State = State.ARMED
+    capturer: Capturer = Capturer()
     time_armed_start_s: float = time.monotonic()
     done_event = threading.Event()
     lock = threading.Lock()
@@ -127,7 +129,7 @@ class Acquistion:
 
     def _done(self) -> None:
         self.done_event.set()
-        self.state = State.IDLE
+        self.state = State.ARMED
 
     def wait_for_acquisition(self) -> None:
         """
@@ -135,7 +137,7 @@ class Acquistion:
         Reset the last shot and get ready.
         """
         with self.lock:
-            self.recorder = Recorder()
+            self.capturer = Capturer()
             self.time_armed_start_s: float = time.monotonic()
             self.state = State.ARMED
             self.done_event.clear()
@@ -143,8 +145,8 @@ class Acquistion:
 
     def start(self, measurements: MeasurementSequence, idx0_start: int) -> None:
         with self.lock:
-            self.state = State.RECORD
-            self.recorder = Recorder.start(
+            self.state = State.CAPTURING
+            self.capturer = Capturer.start(
                 measurements=measurements, idx0_start=idx0_start
             )
             logger.info(
@@ -153,7 +155,7 @@ class Acquistion:
 
     def append(self, measurements: MeasurementSequence) -> None:
         with self.lock:
-            self.recorder.append(measurements=measurements)
+            self.capturer.append(measurements=measurements)
             logger.info(f"{self.state.name} append({len(measurements.adc_value_V)})")
 
     # def stop(self, measurements: MeasurementSequence, idx0_end: int) -> None:
@@ -166,12 +168,12 @@ class Acquistion:
     #         )
 
     def found_raising_edge(self) -> bool:
-        idx = self.recorder.IN_disable_raising_edge()
+        idx = self.capturer.IN_disable_raising_edge()
         if idx is None:
             return False
-        
+
         with self.lock:
-            self.state = State.IDLE
+            self.state = State.ARMED
             self._done()
             logger.info(
                 f"{self.state.name} stop({len(measurements.adc_value_V)}, idx0_end={idx0_end})"
@@ -250,28 +252,28 @@ class AdThread(threading.Thread):
 
                 def handle_state(measurements: MeasurementSequence) -> None:
 
-                    if self._aquisition.state is State.ARMED:
-                        logger.info("TODO REMOVE handle_state(ARMED)")
-                        self._aquisition.start(
-                            measurements=measurements,
-                            idx0_start=self.ad.decoder.size(),
-                        )
-                        if False:
-                            array_idx0_enabled = np.nonzero(measurements.IN_disable)[0]
-                            if len(array_idx0_enabled) == 0:
-                                logger.info(
-                                    f"TODO REMOVE array_idx0_enabled={array_idx0_enabled}"
-                                )
-                                self._aquisition.handle_timeout()
-                                return
-                            idx0_enabled = array_idx0_enabled[0]
-                            self._aquisition.start(
-                                measurements=measurements,
-                                idx0_start=idx0_enabled,
-                            )
-                        return
+                    # if self._aquisition.state is State.ARMED:
+                    #     logger.info("TODO REMOVE handle_state(ARMED)")
+                    #     self._aquisition.start(
+                    #         measurements=measurements,
+                    #         idx0_start=self.ad.decoder.size(),
+                    #     )
+                    #     if False:
+                    #         array_idx0_enabled = np.nonzero(measurements.IN_disable)[0]
+                    #         if len(array_idx0_enabled) == 0:
+                    #             logger.info(
+                    #                 f"TODO REMOVE array_idx0_enabled={array_idx0_enabled}"
+                    #             )
+                    #             self._aquisition.handle_timeout()
+                    #             return
+                    #         idx0_enabled = array_idx0_enabled[0]
+                    #         self._aquisition.start(
+                    #             measurements=measurements,
+                    #             idx0_start=idx0_enabled,
+                    #         )
+                    #     return
 
-                    if self._aquisition.state is State.RECORD:
+                    if self._aquisition.state is State.CAPTURING:
                         self._aquisition.append(measurements=measurements)
                         if self._aquisition.found_raising_edge():
                             return
@@ -341,9 +343,9 @@ class AdThread(threading.Thread):
         self._aquisition.wait_for_acquisition()
         logger.info("TODO REMOVE wait_measurements() C")
 
-        CHANNEL_DISABLE.data = self._aquisition.recorder.IN_disable
-        CHANNEL_T.data = self._aquisition.recorder.IN_t
-        CHANNEL_VOLTAGE.data = self._aquisition.recorder.IN_voltage
+        CHANNEL_DISABLE.data = self._aquisition.capturer.IN_disable
+        CHANNEL_T.data = self._aquisition.capturer.IN_t
+        CHANNEL_VOLTAGE.data = self._aquisition.capturer.IN_voltage
         # dict_channels[]
         # for idx, channel in enumerate(dict_channels.values()):
         #     channel.data = np.array([1.0 * idx + i * 0.001 for i in range(12)])
