@@ -70,8 +70,8 @@ class Capturer:
     @staticmethod
     def find_raising_edge(array_of_bool: np.ndarray) -> typing.Optional[int]:
         """
-        Returns the first transition from 0 to 1. Returns the index of '1'.
-        Returns None if no transition found.
+        Returns the first raising edge from 0 to 1. Returns the index of '1'.
+        Returns None if no raising edge found.
 
         import numpy as np
         >>> high_low_high = np.array([1, 1, 0, 0, 1], bool)
@@ -81,16 +81,28 @@ class Capturer:
         >>> low[0]
         2
         """
+        logger.info(f"TOBE REMOVE find_raising_edge({len(array_of_bool)})")
+        if len(array_of_bool) == 0:
+            logger.info(f"TOBE REMOVE find_raising_edge({len(array_of_bool)}) A")
+            return None
+
         # Find first '0'
         array0 = np.nonzero(array_of_bool == 0)[0]
         if len(array0) == 0:
+            logger.info(f"TOBE REMOVE find_raising_edge({len(array_of_bool)}) B")
             return None
+
         idx0_first0 = array0[0]
+        logger.info(f"TOBE REMOVE find_raising_edge({len(array_of_bool)}) C idx0_first0={idx0_first0}")
         # From this position, find first '1'
         array1 = np.nonzero(array_of_bool[idx0_first0:])[0]
         if len(array1) == 0:
+            logger.info(f"TOBE REMOVE find_raising_edge({len(array_of_bool)}) D")
             return None
+
+        # Raising edge detected
         idx0_first1 = array1[0]
+        logger.info(f"TOBE REMOVE find_raising_edge({len(array_of_bool)}) D idx0_first0={idx0_first0} idx0_first1={idx0_first1}")
         return idx0_first1
 
     def limit_end(self, idx0: int) -> None:

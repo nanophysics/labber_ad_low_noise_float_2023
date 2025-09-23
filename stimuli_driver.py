@@ -55,21 +55,23 @@ class Driver(InstrumentDriver.InstrumentWorker):
             return value
 
         if quant.name == "Synchron":
-            synchron_text = quant.getValueString()
-            if synchron_text == "ASYNCHRON":
+            if value == "ASYNCHRON":
+                logger.info(f"TODO REMOVE ASYNCHRON")
                 self.run_synchron = False
                 self.do_validate = False
-            elif synchron_text == "SYNCHRON_DEBUG":
+            elif value == "SYNCHRON_DEBUG":
+                logger.info(f"TODO REMOVE SYNCHRON_DEBUG")
                 self.run_synchron = True
                 self.do_validate = False
-            elif synchron_text == "VALIDATE_DEBUG":
+            elif value == "VALIDATE_DEBUG":
                 self.run_synchron = True
                 self.do_validate = True
             else:
-                assert False, synchron_text
+                assert False, value
             return value
 
         if quant.name == "Scenario":
+            logger.info(f"TODO REMOVE self.run_synchron={self.run_synchron}")
             self.pico.run_scenario(
                 scenario=round(value),
                 run_synchron=self.run_synchron,
