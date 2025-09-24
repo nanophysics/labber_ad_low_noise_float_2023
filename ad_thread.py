@@ -64,14 +64,11 @@ class Capturer:
         assert len(self.IN_voltage) == len(self.IN_disable)
         assert len(self.IN_voltage) == len(self.IN_t)
 
-    def IN_disable_raising_edge(self) -> typing.Optional[int]:
-        return self.find_raising_edge(self.IN_disable)
-
     @staticmethod
-    def find_raising_edge(array_of_bool: np.ndarray) -> typing.Optional[int]:
+    def find_first0(array_of_bool: np.ndarray) -> typing.Optional[int]:
         """
-        Returns the first raising edge from 0 to 1. Returns the index of '1'.
-        Returns None if no raising edge found.
+        Returns the index of the first '0'.
+        Returns None if no '0' found.
 
         import numpy as np
         >>> high_low_high = np.array([1, 1, 0, 0, 1], bool)
@@ -81,29 +78,42 @@ class Capturer:
         >>> low[0]
         2
         """
-        logger.info(f"TOBE REMOVE find_raising_edge({len(array_of_bool)})")
+        logger.info(f"TOBE REMOVE find_first0({len(array_of_bool)})")
         if len(array_of_bool) == 0:
-            logger.info(f"TOBE REMOVE find_raising_edge({len(array_of_bool)}) A")
+            logger.info(f"TOBE REMOVE find_first0({len(array_of_bool)}) A")
             return None
 
         # Find first '0'
         array0 = np.nonzero(array_of_bool == 0)[0]
         if len(array0) == 0:
-            logger.info(f"TOBE REMOVE find_raising_edge({len(array_of_bool)}) B")
+            logger.info(f"TOBE REMOVE find_first0({len(array_of_bool)}) B")
             return None
 
         idx0_first0 = array0[0]
-        logger.info(f"TOBE REMOVE find_raising_edge({len(array_of_bool)}) C idx0_first0={idx0_first0}")
-        # From this position, find first '1'
-        array1 = np.nonzero(array_of_bool[idx0_first0:])[0]
+        logger.info(f"TOBE REMOVE find_first0({len(array_of_bool)}) C idx0_first0={idx0_first0}")
+        return idx0_first0
+
+    @staticmethod
+    def find_first1(array_of_bool: np.ndarray) -> typing.Optional[int]:
+        """
+        Returns the index of the first '1'.
+        Returns None if no '1' found.
+        """
+        # find first '1'
+        array1 = np.nonzero(array_of_bool == 1)[0]
         if len(array1) == 0:
-            logger.info(f"TOBE REMOVE find_raising_edge({len(array_of_bool)}) D")
+            logger.info(f"TOBE REMOVE find_first1({len(array_of_bool)}) D")
             return None
 
         # Raising edge detected
         idx0_first1 = array1[0]
-        logger.info(f"TOBE REMOVE find_raising_edge({len(array_of_bool)}) D idx0_first0={idx0_first0} idx0_first1={idx0_first1}")
+        logger.info(f"TOBE REMOVE find_first1({len(array_of_bool)}) D idx0_first1={idx0_first1}")
         return idx0_first1
+
+    def limit_begin(self, idx0: int) -> None:
+        self.IN_disable = self.IN_disable[idx0:]
+        self.IN_t = self.IN_t[idx0:]
+        self.IN_voltage = self.IN_voltage[idx0:]
 
     def limit_end(self, idx0: int) -> None:
         self.IN_disable = self.IN_disable[:idx0]
@@ -178,11 +188,27 @@ class Acquistion:
     #         )
 
     def found_raising_edge(self) -> bool:
-        idx0 = self.capturer.IN_disable_raising_edge()
+        done = len(self.capturer.IN_disable) > 400_000
+        if done:
+            with self.lock:
+                self.state = State.ARMED
+                self._done()
+            logger.info(f"found_raising_edge)")
+            return True
+        return False
+
+        idx0 = self.capturer.find_first0(self.capturer.IN_disable)
+        if idx0 is None:
+            return False
+        
+        # self.capturer.limit_begin(max(0, idx0-5))
+        self.capturer.limit_begin(idx0)
+
+        idx0 = self.capturer.find_first1(self.capturer.IN_disable)
         if idx0 is None:
             return False
 
-        self.capturer.limit_end(idx0=idx0)
+        self.capturer.limit_end(idx0=idx0+5)
         with self.lock:
             self.state = State.ARMED
             self._done()

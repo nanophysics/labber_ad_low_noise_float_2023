@@ -42,6 +42,8 @@ It may produces signals with given timings to provoke verious reading situations
 A scenario is a sequence of output states hard coded in the pico.
 For example:
 
+TODO: Fix calls to new syntax
+
 Scenario 0 `prepare disable high`
 ```python
 IN_disable(1)
