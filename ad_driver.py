@@ -56,9 +56,16 @@ class Driver(InstrumentDriver.InstrumentWorker):
         self._thread.stop()
         self._thread = None
 
+    # def performSetValue(self, quant, value, sweepRate=0.0, options={}):
+    #     begin_s = time.monotonic()
+    #     rc = self._performSetValue(quant=quant, value=value, sweepRate=sweepRate, options=options)
+    #     logger.info(f"performSetValue('{quant.name}') returned. {time.monotonic()-begin_s:0.2f}s")
+    #     return rc
+
     def performSetValue(self, quant, value, sweepRate=0.0, options={}):
         """Perform the Set Value instrument operation. This function should
         return the actual value set by the instrument"""
+        begin_s = time.monotonic()
 
         value_before = self.getValue(quant.name)
 
@@ -69,7 +76,7 @@ class Driver(InstrumentDriver.InstrumentWorker):
                 logger.warning(f"Nobody was setting '{quant.name}'...")
 
         first_call = "FIRST" if self.isFirstCall(options) else ""
-        logger.info(f"performSetValue('{quant.name}', {value_before} -> {new_value}) {first_call}")
+        logger.info(f"performSetValue('{quant.name}', {value_before} -> {new_value}) {first_call} {time.monotonic()-begin_s:0.2f}s")
 
         return new_value
 
@@ -79,6 +86,12 @@ class Driver(InstrumentDriver.InstrumentWorker):
         return False
 
     def performGetValue(self, quant, options={}):
+        begin_s = time.monotonic()
+        rc = self._performGetValue(quant=quant, options=options)
+        logger.info(f"performGetValue('{quant.name}') returned {time.monotonic()-begin_s:0.2f}s")
+        return rc
+    
+    def _performGetValue(self, quant, options={}):
         """Perform the Get Value instrument operation"""
         # only implmeneted for geophone voltage
         isFirstCall = self.isFirstCall(options)

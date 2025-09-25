@@ -188,7 +188,7 @@ class Acquistion:
     #         )
 
     def found_raising_edge(self) -> bool:
-        done = len(self.capturer.IN_disable) > 400_000
+        done = len(self.capturer.IN_disable) > 800_000
         if done:
             with self.lock:
                 self.state = State.ARMED
@@ -271,9 +271,10 @@ class AdThread(threading.Thread):
             )
             self.ad_needs_reconnect = False
             # Read the jumper settings
+            logger.info(f"TODO REMOVE self.ad.decoder.size()={self.ad.decoder.size()} Bytes")
             self.ad.connect(pcb_params=pcb_params)
             settings_program = self.ad.pcb_status.settings["PROGRAM"]
-            REQUIRED_VERSION = "ad_low_noise_float_2023(0.3.6)"
+            REQUIRED_VERSION = "ad_low_noise_float_2023(0.3.8)"
             if settings_program < REQUIRED_VERSION:
                 raise ValueError(
                     f"Found '{settings_program}' but required at least '{REQUIRED_VERSION}'!"
@@ -286,6 +287,9 @@ class AdThread(threading.Thread):
                     return
                 if self.ad_needs_reconnect:
                     break
+
+
+
 
                 def handle_state(measurements: MeasurementSequence) -> None:
 
@@ -311,6 +315,8 @@ class AdThread(threading.Thread):
                     #     return
 
                     if self._aquisition.state is State.CAPTURING:
+                        logger.info(f"TODO REMOVE self.ad.decoder.size()={self.ad.decoder.size()} Bytes")
+
                         self._aquisition.append(
                             measurements=measurements,
                             idx0_start=self.ad.decoder.size(),
@@ -322,7 +328,19 @@ class AdThread(threading.Thread):
                         )
 
                 handle_state(measurements)
-                logger.info(f"TODO REMOVE handle_state({self._aquisition.state.name})")
+                # logger.info(f"TODO REMOVE handle_state({self._aquisition.state.name})")
+
+                def log_IN_disable_t(measurements: MeasurementSequence) -> None:
+                    msg =  f"adc_value_V={measurements.adc_value_V[0]:5.2f}->{measurements.adc_value_V[-1]:5.2f}"
+                    msg += f" IN_disable={measurements.IN_disable[0]:d}->{measurements.IN_disable[-1]:d}"
+                    msg += f" IN_t={measurements.IN_t[0]:d}->{measurements.IN_t[-1]:d}"
+                    msg += f" state={self._aquisition.state.name}"
+                    msg += f" decoder.size()={self.ad.decoder.size()//3:5d} Samples"
+                    if self._aquisition.state is State.CAPTURING:
+                        msg += f" samples={len(self._aquisition.capturer.IN_voltage)}"
+                    logger.info(msg)
+
+                log_IN_disable_t(measurements)
 
                 # l = self.ad.pcb_status.list_errors(error_code=errors, inclusive_status=True)
                 # print(f"{adc_value_V[0]:0.2f}V, {int(errors):016b}, {l}")
@@ -333,19 +351,22 @@ class AdThread(threading.Thread):
                         f"{int(measurements.errors):016b} measurements={len(measurements.adc_value_V):5d} IN_disable={IN_disable} IN_t={IN_t}"
                     )
 
-                error_codes = self.ad.pcb_status.list_errors(
-                    error_code=measurements.errors, inclusive_status=True
-                )
-                elements = []
-                elements.append(f"{measurements.adc_value_V[-1]:0.2f}V")
-                elements.append(f"{len(measurements.adc_value_V)}")
-                if measurements.IN_disable is not None:
-                    elements.append(f"IN_disable={measurements.IN_disable[-1]}")
-                if measurements.IN_t is not None:
-                    elements.append(f"IN_t={measurements.IN_t[-1]}")
-                elements.append(f"{int(measurements.errors):016b}")
-                elements.append(f"{error_codes}")
-                print(" ".join(elements))
+                def log_errors(measurements: MeasurementSequence):
+                    error_codes = self.ad.pcb_status.list_errors(
+                        error_code=measurements.errors, inclusive_status=True
+                    )
+                    elements = []
+                    elements.append(f"{measurements.adc_value_V[-1]:0.2f}V")
+                    elements.append(f"{len(measurements.adc_value_V)}")
+                    if measurements.IN_disable is not None:
+                        elements.append(f"IN_disable={measurements.IN_disable[-1]}")
+                    if measurements.IN_t is not None:
+                        elements.append(f"IN_t={measurements.IN_t[-1]}")
+                    elements.append(f"{int(measurements.errors):016b}")
+                    elements.append(f"{error_codes}")
+                    print(" ".join(elements))
+
+                # log_errors(measurements)
 
     def stop(self):
         self._stopping = True
