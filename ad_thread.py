@@ -90,7 +90,9 @@ class Capturer:
             return None
 
         idx0_first0 = array0[0]
-        logger.info(f"TOBE REMOVE find_first0({len(array_of_bool)}) C idx0_first0={idx0_first0}")
+        logger.info(
+            f"TOBE REMOVE find_first0({len(array_of_bool)}) C idx0_first0={idx0_first0}"
+        )
         return idx0_first0
 
     @staticmethod
@@ -107,7 +109,9 @@ class Capturer:
 
         # Raising edge detected
         idx0_first1 = array1[0]
-        logger.info(f"TOBE REMOVE find_first1({len(array_of_bool)}) D idx0_first1={idx0_first1}")
+        logger.info(
+            f"TOBE REMOVE find_first1({len(array_of_bool)}) D idx0_first1={idx0_first1}"
+        )
         return idx0_first1
 
     def limit_begin(self, idx0: int) -> None:
@@ -128,6 +132,11 @@ class Acquistion:
     time_armed_start_s: float = time.monotonic()
     done_event = threading.Event()
     lock = threading.Lock()
+    out_timeout: bool = False
+    out_failing: bool = False
+    out_raising: bool = False
+    out_failing_s: float = 0.0
+    out_enabled_s: float = 0.0
 
     def handle_timeout(self, duration_max_s: float) -> bool:
         """
@@ -151,6 +160,11 @@ class Acquistion:
         """
         with self.lock:
             self.capturer = None
+            self.out_timeout = False
+            self.out_failing = False
+            self.out_raising = False
+            self.out_failing_s = 0.0
+            self.out_enabled_s = 0.0
             self.time_armed_start_s: float = time.monotonic()
             self.state = State.CAPTURING
             self.done_event.clear()
@@ -200,7 +214,7 @@ class Acquistion:
         idx0 = self.capturer.find_first0(self.capturer.IN_disable)
         if idx0 is None:
             return False
-        
+
         # self.capturer.limit_begin(max(0, idx0-5))
         self.capturer.limit_begin(idx0)
 
@@ -208,7 +222,7 @@ class Acquistion:
         if idx0 is None:
             return False
 
-        self.capturer.limit_end(idx0=idx0+5)
+        self.capturer.limit_end(idx0=idx0 + 5)
         with self.lock:
             self.state = State.ARMED
             self._done()
@@ -272,13 +286,15 @@ class AdThread(threading.Thread):
             )
             self.ad_needs_reconnect = False
             # Read the jumper settings
-            logger.info(f"TODO REMOVE self.ad.decoder.size()={self.ad.decoder.size()} Bytes")
+            logger.info(
+                f"TODO REMOVE self.ad.decoder.size()={self.ad.decoder.size()} Bytes"
+            )
             logger.info("connect(): Start reconnect to update SPS.")
             self.ad.connect(pcb_params=pcb_params)
             logger.info("connect(): Done reconnect to update SPS.")
             settings_program = self.ad.pcb_status.settings["PROGRAM"]
-            REQUIRED_VERSION = "ad_low_noise_float_2023(0.3.8)"
-            if settings_program < REQUIRED_VERSION:
+            REQUIRED_VERSION = "ad_low_noise_float_2023(0.3.10)"
+            if (settings_program < REQUIRED_VERSION) or (len(settings_program) < len(REQUIRED_VERSION)):
                 raise ValueError(
                     f"Found '{settings_program}' but required at least '{REQUIRED_VERSION}'!"
                 )
@@ -290,9 +306,6 @@ class AdThread(threading.Thread):
                     return
                 if self.ad_needs_reconnect:
                     break
-
-
-
 
                 def handle_state(measurements: MeasurementSequence) -> None:
 
@@ -318,7 +331,9 @@ class AdThread(threading.Thread):
                     #     return
 
                     if self._aquisition.state is State.CAPTURING:
-                        logger.info(f"TODO REMOVE self.ad.decoder.size()={self.ad.decoder.size()} Bytes")
+                        logger.info(
+                            f"TODO REMOVE self.ad.decoder.size()={self.ad.decoder.size()} Bytes"
+                        )
 
                         self._aquisition.append(
                             measurements=measurements,
@@ -334,7 +349,7 @@ class AdThread(threading.Thread):
                 # logger.info(f"TODO REMOVE handle_state({self._aquisition.state.name})")
 
                 def log_IN_disable_t(measurements: MeasurementSequence) -> None:
-                    msg =  f"adc_value_V={measurements.adc_value_V[0]:5.2f}->{measurements.adc_value_V[-1]:5.2f}"
+                    msg = f"adc_value_V={measurements.adc_value_V[0]:5.2f}->{measurements.adc_value_V[-1]:5.2f}"
                     msg += f" IN_disable={measurements.IN_disable[0]:d}->{measurements.IN_disable[-1]:d}"
                     msg += f" IN_t={measurements.IN_t[0]:d}->{measurements.IN_t[-1]:d}"
                     msg += f" state={self._aquisition.state.name}"
@@ -473,16 +488,18 @@ class AdThread(threading.Thread):
         Returns the new value.
         Returns None if quant.name does not match.
         """
-        if quant_name == "Sample rate SPS":
+        if quant_name == "sample_rate_SPS":
             before = self.register_filter1
             self.register_filter1 = RegisterFilter1.factory(value)
             assert isinstance(self.register_filter1, RegisterFilter1)
             if before != self.register_filter1:
-                logger.info(f"SPS changed from {before.name} to {self.register_filter1.name}: Requires reconnect to the AD pico.")
+                logger.info(
+                    f"SPS changed from {before.name} to {self.register_filter1.name}: Requires reconnect to the AD pico."
+                )
                 self.ad_needs_reconnect = True
             return value
 
-        if quant_name == "duration max s":
+        if quant_name == "duration_max_s":
             value = max(0.001, value)
             value = min(1000, value)
             self.duration_max_s = value
@@ -495,11 +512,27 @@ class AdThread(threading.Thread):
         if quant.name == "Input range":
             return self.ad.pcb_status.gain_from_jumpers
 
-        if quant.name == "Sample rate SPS":
+        if quant.name == "sample_rate_SPS":
             return self.register_filter1.name
 
-        if quant.name == "duration max s":
+        if quant.name == "duration_max_s":
             return self.duration_max_s
+
+        if quant.name == "out_timeout":
+            return self._aquisition.out_timeout
+
+        if quant.name == "out_failing":
+            return self._aquisition.out_failing
+
+        if quant.name == "out_raising":
+            return self._aquisition.out_raising
+
+        if quant.name == "out_failing_s":
+            return self._aquisition.out_failing_s
+
+        if quant.name == "out_enabled_s":
+            return self._aquisition.out_enabled_s
+
         return None
 
     # def get_value(self, name: str):

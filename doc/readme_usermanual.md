@@ -35,7 +35,7 @@ stateDiagram-v2
 
     [*] --> a
     c --> a: raising edge withing 'IN_disable'
-    c --> a: Timeout "duration max s"
+    c --> a: Timeout "duration_max_s"
     a --> a: Labber performGetValue(IN_xx) - NOT 'isFirstCall'
     a --> c: Labber performGetValue(IN_xx) - 'isFirstCall'
 ```

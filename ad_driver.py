@@ -125,8 +125,8 @@ class Driver(InstrumentDriver.InstrumentWorker):
         # logger.info("Sleep 7s")
         # time.sleep(7)
         
-        # duration_max_s = float(self.getValue("duration max s"))
-        # sample_rate_sps_text = self.getValue("Sample rate SPS")
+        # duration_max_s = float(self.getValue("duration_max_s"))
+        # sample_rate_sps_text = self.getValue("sample_rate_SPS")
         sample_rate_sps = 97656  # TODO
         # sample_count = int(duration_max_s * sample_rate_sps)
 
