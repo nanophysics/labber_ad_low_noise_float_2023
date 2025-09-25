@@ -56,11 +56,11 @@ class Driver(InstrumentDriver.InstrumentWorker):
 
         if quant.name == "Synchron":
             if value == "ASYNCHRON":
-                logger.info(f"TODO REMOVE ASYNCHRON")
+                logger.info("TODO REMOVE ASYNCHRON")
                 self.run_synchron = False
                 self.do_validate = False
             elif value == "SYNCHRON_DEBUG":
-                logger.info(f"TODO REMOVE SYNCHRON_DEBUG")
+                logger.info("TODO REMOVE SYNCHRON_DEBUG")
                 self.run_synchron = True
                 self.do_validate = False
             elif value == "VALIDATE_DEBUG":

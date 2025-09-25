@@ -1,5 +1,5 @@
 def scenario(ctx):
-    time_ms = 500
+    time_ms = 100
 
     ctx.wait_ms(time_ms)
 

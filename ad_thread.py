@@ -19,6 +19,8 @@ from ad_utils import CHANNEL_VOLTAGE, CHANNEL_T, CHANNEL_DISABLE
 TICK_INTERVAL_S = 0.5
 SAMPLE_COUNT_PRE_POST = 1
 
+TODO_REMOVE = False
+
 logger = logging.getLogger("LabberDriver")
 logger_ad = logging.getLogger(LOGGER_NAME)
 
@@ -79,21 +81,25 @@ class Capturer:
         >>> low[0]
         2
         """
-        logger.info(f"TOBE REMOVE find_first0({len(array_of_bool)})")
+        if TODO_REMOVE:
+            logger.info(f"TOBE REMOVE find_first0({len(array_of_bool)})")
         if len(array_of_bool) == 0:
-            logger.info(f"TOBE REMOVE find_first0({len(array_of_bool)}) A")
+            if TODO_REMOVE:
+                logger.info(f"TOBE REMOVE find_first0({len(array_of_bool)}) A")
             return None
 
         # Find first '0'
         array0 = np.nonzero(array_of_bool == 0)[0]
         if len(array0) == 0:
-            logger.info(f"TOBE REMOVE find_first0({len(array_of_bool)}) B")
+            if TODO_REMOVE:
+                logger.info(f"TOBE REMOVE find_first0({len(array_of_bool)}) B")
             return None
 
         idx0_first0 = int(array0[0])
-        logger.info(
-            f"TOBE REMOVE find_first0({len(array_of_bool)}) C idx0_first0={idx0_first0}"
-        )
+        if TODO_REMOVE:
+            logger.info(
+                f"TOBE REMOVE find_first0({len(array_of_bool)}) C idx0_first0={idx0_first0}"
+            )
         return idx0_first0
 
     @staticmethod
@@ -105,14 +111,16 @@ class Capturer:
         # find first '1'
         array1 = np.nonzero(array_of_bool == 1)[0]
         if len(array1) == 0:
-            logger.info(f"TOBE REMOVE find_first1({len(array_of_bool)}) D")
+            if TODO_REMOVE:
+                logger.info(f"TOBE REMOVE find_first1({len(array_of_bool)}) D")
             return None
 
         # Raising edge detected
         idx0_first1 = int(array1[0])
-        logger.info(
-            f"TOBE REMOVE find_first1({len(array_of_bool)}) D idx0_first1={idx0_first1}"
-        )
+        if TODO_REMOVE:
+            logger.info(
+                f"TOBE REMOVE find_first1({len(array_of_bool)}) D idx0_first1={idx0_first1}"
+            )
         return idx0_first1
 
     def limit_begin(self, idx0: int) -> None:
@@ -353,14 +361,16 @@ class AdThread(threading.Thread):
             pcb_params = PcbParams(
                 input_Vp=1.0, register_filter1=self.register_filter1, resolution22=True
             )
-            logger.info(
-                f"connect with input_Vp={pcb_params.input_Vp:0.1f}V, SPS={self.register_filter1.name}"
-            )
+            if TODO_REMOVE:
+                logger.info(
+                    f"connect with input_Vp={pcb_params.input_Vp:0.1f}V, SPS={self.register_filter1.name}"
+                )
             self.ad_needs_reconnect = False
             # Read the jumper settings
-            logger.info(
-                f"TODO REMOVE self.ad.decoder.size()={self.ad.decoder.size()} Bytes"
-            )
+            if TODO_REMOVE:
+                logger.info(
+                    f"TODO REMOVE self.ad.decoder.size()={self.ad.decoder.size()} Bytes"
+                )
             logger.info("connect(): Start reconnect to update SPS.")
             self.ad.connect(pcb_params=pcb_params)
             logger.info("connect(): Done reconnect to update SPS.")
@@ -384,31 +394,12 @@ class AdThread(threading.Thread):
 
                 def handle_state(measurements: MeasurementSequence) -> None:
 
-                    # if self._aquisition.state is State.ARMED:
-                    #     logger.info("TODO REMOVE handle_state(ARMED)")
-                    #     self._aquisition.start(
-                    #         measurements=measurements,
-                    #         idx0_start=self.ad.decoder.size(),
-                    #     )
-                    #     if False:
-                    #         array_idx0_enabled = np.nonzero(measurements.IN_disable)[0]
-                    #         if len(array_idx0_enabled) == 0:
-                    #             logger.info(
-                    #                 f"TODO REMOVE array_idx0_enabled={array_idx0_enabled}"
-                    #             )
-                    #             self._aquisition.handle_timeout()
-                    #             return
-                    #         idx0_enabled = array_idx0_enabled[0]
-                    #         self._aquisition.start(
-                    #             measurements=measurements,
-                    #             idx0_start=idx0_enabled,
-                    #         )
-                    #     return
-
                     if self._aquisition.state is State.CAPTURING:
-                        logger.info(
-                            f"TODO REMOVE self.ad.decoder.size()={self.ad.decoder.size()} Bytes"
-                        )
+                        if TODO_REMOVE:
+
+                            logger.info(
+                                f"TODO REMOVE self.ad.decoder.size()={self.ad.decoder.size()} Bytes"
+                            )
 
                         self._aquisition.append(
                             measurements=measurements,
@@ -430,16 +421,8 @@ class AdThread(threading.Thread):
                         msg += f" samples={len(self._aquisition.capturer.IN_voltage)}"
                     logger.info(msg)
 
-                log_IN_disable_t(measurements)
-
-                # l = self.ad.pcb_status.list_errors(error_code=errors, inclusive_status=True)
-                # print(f"{adc_value_V[0]:0.2f}V, {int(errors):016b}, {l}")
                 if False:
-                    IN_disable = int(measurements.IN_disable[0])
-                    IN_t = int(measurements.IN_t[0])
-                    logger_ad.debug(
-                        f"{int(measurements.errors):016b} measurements={len(measurements.adc_value_V):5d} IN_disable={IN_disable} IN_t={IN_t}"
-                    )
+                    log_IN_disable_t(measurements)
 
                 def log_errors(measurements: MeasurementSequence):
                     error_codes = self.ad.pcb_status.list_errors(
@@ -456,7 +439,8 @@ class AdThread(threading.Thread):
                     elements.append(f"{error_codes}")
                     print(" ".join(elements))
 
-                # log_errors(measurements)
+                if False:
+                    log_errors(measurements)
 
     def stop(self):
         self._stopping = True
@@ -477,82 +461,15 @@ class AdThread(threading.Thread):
         """
         This method will until the measurements are acquired.
         """
-        logger.info("TODO REMOVE wait_measurements() A")
+        if TODO_REMOVE:
+            logger.info("TODO REMOVE wait_measurements() ENTER")
         self._aquisition.wait_for_acquisition()
-        logger.info("TODO REMOVE wait_measurements() C")
+        if TODO_REMOVE:
+            logger.info("TODO REMOVE wait_measurements() LEAVE")
 
         CHANNEL_DISABLE.data = self._aquisition.capturer.IN_disable
         CHANNEL_T.data = self._aquisition.capturer.IN_t
         CHANNEL_VOLTAGE.data = self._aquisition.capturer.IN_voltage
-        # dict_channels[]
-        # for idx, channel in enumerate(dict_channels.values()):
-        #     channel.data = np.array([1.0 * idx + i * 0.001 for i in range(12)])
-
-    # @synchronized
-    # def set_quantity_sync(self, quantity: Quantity, value):
-    #     """
-    #     Called by labber GUI
-    #     """
-    #     return self._visa_station.set_quantity(quantity=quantity, value=value)
-
-    # @synchronized
-    # def wait_till_ramped_sync(self):
-    #     self._visa_station.wait_till_ramped()
-
-    # def set_value(self, name: str, value):
-    #     """
-    #     Called by the tread (visa_station):
-    #     Update a value which may be retrieved later by the labber GUI using 'get_quantity_sync'.
-    #     """
-
-    #     assert isinstance(name, str)
-    #     quantity = Quantity(name)
-
-    #     if quantity is Quantity.ControlWriteTemperatureAndSettle_K:
-    #         return self._set_temperature_and_settle(quantity=quantity, value=value)
-
-    #     return self.set_quantity_sync(quantity=quantity, value=value)
-
-    # def _set_temperature_and_settle_obsolete(self, quantity: Quantity, value: float):
-    #     assert quantity is Quantity.ControlWriteTemperatureAndSettle_K
-
-    #     def block_until_settled():
-    #         tick_count_before = self._visa_station.tick_count
-    #         timeout_s = self._visa_station.time_now_s + self._visa_station.get_quantity(
-    #             Quantity.ControlWriteTimeoutTime_S
-    #         )
-    #         while True:
-    #             self._visa_station.sleep(TICK_INTERVAL_S / 2.0)
-    #             if tick_count_before == self._visa_station.tick_count:
-    #                 # Wait for a tick to make sure that the statemachine was called at least once
-    #                 continue
-    #             if not self._visa_station.hsm_heater.is_state(
-    #                 HeaterHsm.state_connected_thermon_heatingcontrolled
-    #             ):
-    #                 # Unexpected state change
-    #                 logger.info(
-    #                     f"Waiting for 'ControlWriteTemperatureAndSettle_K'. Unexpected state change. Got '{self._visa_station.hsm_heater._state_actual}'!"
-    #                 )
-    #                 return
-    #             if self._is_settled():
-    #                 return
-    #             if self._visa_station.time_now_s > timeout_s:
-    #                 logger.info("Timeout while 'ControlWriteTemperatureAndSettle_K'")
-    #                 return
-
-    #     if abs(value - heater_wrapper.TEMPERATURE_SETTLE_OFF_K) < 1.0e-9:
-    #         logger.warning(f"'{quantity.value}' set to {value:0.1f} K: SKIPPED")
-    #         return
-
-    #     self._visa_station.set_quantity(Quantity.ControlWriteTemperature_K, value)
-    #     self._visa_station.hsm_heater.wait_temperature_and_settle_start()
-    #     logger.warning(
-    #         f"'{quantity.value}' set to {value:0.1f} K: Blocking. Timeout = {self._visa_station.get_quantity(Quantity.ControlWriteTimeoutTime_S)}s"
-    #     )
-    #     block_until_settled()
-    #     self._visa_station.hsm_heater.wait_temperature_and_settle_over()
-    #     logger.warning("Settle/Timeout time over")
-    #     return heater_wrapper.TEMPERATURE_SETTLE_OFF_K
 
     @synchronized
     def set_quantity_sync(self, quant_name: str, value):
@@ -607,35 +524,6 @@ class AdThread(threading.Thread):
 
         return None
 
-    # def get_value(self, name: str):
-    #     """
-    #     This typically returns immedately as it accesses a copy of all values.
-    #     Only in rare cases, it will delay for max 0.5s.
-    #     """
-    #     assert isinstance(name, str)
-    #     quantity = Quantity(name)
-    #     try:
-    #         value = self.dict_values_labber_thread_copy[quantity]
-    #     except KeyError:
-    #         # Not all values are stored in the dictionary.
-    #         # In this case we have to use the synchronized call.
-    #         value = self.get_quantity_sync(quantity=quantity)
-    #     if isinstance(value, enum.Enum):
-    #         return value.value
-    #     return value
-
-    # @synchronized
-    # def get_quantity_sync(self, quantity: Quantity):
-    #     return self._visa_station.get_quantity(quantity=quantity)
-
-    # @synchronized
-    # def signal(self, signal):
-    #     self._visa_station.signal(signal)
-
-    # @synchronized
-    # def expect_state(self, expected_meth):
-    #     self._visa_station.expect_state(expected_meth=expected_meth)
-
 
 def main_standalone():
     logging.basicConfig()
@@ -650,13 +538,6 @@ def main_standalone():
         time.sleep(2.0)
         print(40 * "=")
         thread.wait_measurements()
-    # adc = AdLowNoiseFloat2023()
-
-    # pcb_params=PcbParams(input_Vp=1.0)
-
-    # for _adc_value_V in adc.iter_measurements_V(pcb_params=pcb_params):
-    #     pass
-    #     # print(len(_adc_value_V))
 
 
 if __name__ == "__main__":

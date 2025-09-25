@@ -5,10 +5,8 @@ import logging
 import typing
 
 import InstrumentDriver  # pylint: disable=import-error
-import numpy as np
 
 from ad_low_noise_float_2023.ad import LOGGER_NAME
-from ad_low_noise_float_2023.constants import PcbParams, RegisterFilter1
 
 import ad_utils
 import ad_thread
@@ -34,17 +32,13 @@ class Driver(InstrumentDriver.InstrumentWorker):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._thread: typing.Optional[ad_thread.AdThread] = None
-        # self._thread: AMI430_thread.VisaThread = None
-        # self._ramping_required = True
         self.dict_channels = {ch.label: ch for ch in ad_utils.CHANNELS}
 
 
     def performOpen(self, options={}):
         """Perform the operation of opening the instrument connection"""
 
-        # Reset the usb connection (it must not change the applied voltages)
         self.log("labber_ad_low_noise_float_2023 Driver")
-        # station = AMI430_driver_config.get_station()
         assert self._thread is None
         self._thread = ad_thread.AdThread()
         self._thread.start()
@@ -56,11 +50,6 @@ class Driver(InstrumentDriver.InstrumentWorker):
         self._thread.stop()
         self._thread = None
 
-    # def performSetValue(self, quant, value, sweepRate=0.0, options={}):
-    #     begin_s = time.monotonic()
-    #     rc = self._performSetValue(quant=quant, value=value, sweepRate=sweepRate, options=options)
-    #     logger.info(f"performSetValue('{quant.name}') returned. {time.monotonic()-begin_s:0.2f}s")
-    #     return rc
 
     def performSetValue(self, quant, value, sweepRate=0.0, options={}):
         """Perform the Set Value instrument operation. This function should
@@ -117,22 +106,5 @@ class Driver(InstrumentDriver.InstrumentWorker):
     def wait_trigger(self):
         """Resample the data"""
 
-        logger.info("TODO REMOVE wait_measurements() ENTERING")
         self._thread.wait_measurements()
-        logger.info("TODO REMOVE wait_measurements() LEAVING")
-        return
-
-        # logger.info("Sleep 7s")
-        # time.sleep(7)
         
-        # duration_max_s = float(self.getValue("duration_max_s"))
-        # sample_rate_sps_text = self.getValue("sample_rate_SPS")
-        sample_rate_sps = 97656  # TODO
-        # sample_count = int(duration_max_s * sample_rate_sps)
-
-        for idx, channel in enumerate(self.dict_channels.values()):
-            channel.data = np.array(
-                [1.0 * idx + i * 0.001 for i in range(sample_count)]
-            )
-
-        # self.dt = 1.0 / sample_rate_sps
