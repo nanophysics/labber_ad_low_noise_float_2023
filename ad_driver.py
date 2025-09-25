@@ -109,7 +109,7 @@ class Driver(InstrumentDriver.InstrumentWorker):
                 self.wait_trigger()
 
             # return correct data
-            return quant.getTraceDict(channel.data, dt=self._thread.dt)
+            return quant.getTraceDict(channel.data, dt=1.0/self._thread._aquisition._sps)
 
         # just return the quantity value
         return quant.getValue()

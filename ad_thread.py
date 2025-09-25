@@ -132,22 +132,31 @@ class Acquistion:
     time_armed_start_s: float = time.monotonic()
     done_event = threading.Event()
     lock = threading.Lock()
+    _sps: float = 1.0
     out_timeout: bool = False
     out_failing: bool = False
     out_raising: bool = False
     out_failing_s: float = 0.0
     out_enabled_s: float = 0.0
+    _duration_max_s = 4.2
+    _duration_max_sample = 42
 
-    def handle_timeout(self, duration_max_s: float) -> bool:
-        """
-        Return True if timeout is over
-        """
-        duration_s = time.monotonic() - self.time_armed_start_s
-        if duration_s > duration_max_s:
-            logger.info(f"Timeout={duration_s:0.1f}s")
-            self._done()
-            return True
-        return False
+    def set_SPS(self, register_filter1: RegisterFilter1) -> None:
+        assert isinstance(register_filter1, RegisterFilter1)
+        self._sps = register_filter1.SPS
+        self._update_sps()
+
+    def _update_sps(self)->None:
+        self._duration_max_sample = int(self._duration_max_s * self._sps)
+
+    @property
+    def duration_max_s(self) -> int:
+        return self._duration_max_s
+
+    @duration_max_s.setter
+    def duration_max_s(self, value: int) -> None:
+        self._duration_max_s = value
+        self._update_sps()
 
     def _done(self) -> None:
         self.done_event.set()
@@ -202,8 +211,9 @@ class Acquistion:
     #         )
 
     def found_raising_edge(self) -> bool:
-        done = len(self.capturer.IN_disable) > 400_000
-        if done:
+        self.out_timeout = len(self.capturer.IN_disable) > self._duration_max_sample
+        if self.out_timeout:
+            logger.info(f"TIMEOUT {len(self.capturer.IN_disable)}({self._duration_max_sample})samples {self.duration_max_s:0.3f}s {self._sps}SPS")
             with self.lock:
                 self.state = State.ARMED
                 self._done()
@@ -256,8 +266,6 @@ class AdThread(threading.Thread):
         self.ad_needs_reconnect: bool = False
         self._aquisition = Acquistion()
         self._stopping = False
-        self.duration_max_s = 5.0
-        self.dt: float = 1.0
 
     def run(self):
         """
@@ -292,9 +300,12 @@ class AdThread(threading.Thread):
             logger.info("connect(): Start reconnect to update SPS.")
             self.ad.connect(pcb_params=pcb_params)
             logger.info("connect(): Done reconnect to update SPS.")
+            self._aquisition.set_SPS(pcb_params.register_filter1)
             settings_program = self.ad.pcb_status.settings["PROGRAM"]
             REQUIRED_VERSION = "ad_low_noise_float_2023(0.3.10)"
-            if (settings_program < REQUIRED_VERSION) or (len(settings_program) < len(REQUIRED_VERSION)):
+            if (settings_program < REQUIRED_VERSION) or (
+                len(settings_program) < len(REQUIRED_VERSION)
+            ):
                 raise ValueError(
                     f"Found '{settings_program}' but required at least '{REQUIRED_VERSION}'!"
                 )
@@ -341,9 +352,6 @@ class AdThread(threading.Thread):
                         )
                         if self._aquisition.found_raising_edge():
                             return
-                        self._aquisition.handle_timeout(
-                            duration_max_s=self.duration_max_s
-                        )
 
                 handle_state(measurements)
                 # logger.info(f"TODO REMOVE handle_state({self._aquisition.state.name})")
@@ -502,7 +510,7 @@ class AdThread(threading.Thread):
         if quant_name == "duration_max_s":
             value = max(0.001, value)
             value = min(1000, value)
-            self.duration_max_s = value
+            self._aquisition.duration_max_s = value
             return value
 
         return None
@@ -516,7 +524,7 @@ class AdThread(threading.Thread):
             return self.register_filter1.name
 
         if quant.name == "duration_max_s":
-            return self.duration_max_s
+            return self._aquisition.duration_max_s
 
         if quant.name == "out_timeout":
             return self._aquisition.out_timeout
