@@ -5,7 +5,6 @@ C:\Program Files\Labber\Drivers\Examples\SimpleSignalGenerator
 
 import sys
 import logging
-import enum
 
 import InstrumentDriver
 
@@ -19,6 +18,8 @@ logger.setLevel(logging.DEBUG)
 
 print(sys.version_info)
 stimuli_utils.assert_correct_python_version()
+
+TODO_REMOVE = False
 
 
 class Driver(InstrumentDriver.InstrumentWorker):
@@ -56,11 +57,13 @@ class Driver(InstrumentDriver.InstrumentWorker):
 
         if quant.name == "Synchron":
             if value == "ASYNCHRON":
-                logger.info("TODO REMOVE ASYNCHRON")
+                if TODO_REMOVE:
+                    logger.info("TODO REMOVE ASYNCHRON")
                 self.run_synchron = False
                 self.do_validate = False
             elif value == "SYNCHRON_DEBUG":
-                logger.info("TODO REMOVE SYNCHRON_DEBUG")
+                if TODO_REMOVE:
+                    logger.info("TODO REMOVE SYNCHRON_DEBUG")
                 self.run_synchron = True
                 self.do_validate = False
             elif value == "VALIDATE_DEBUG":
@@ -71,7 +74,8 @@ class Driver(InstrumentDriver.InstrumentWorker):
             return value
 
         if quant.name == "Scenario":
-            logger.info(f"TODO REMOVE self.run_synchron={self.run_synchron}")
+            if TODO_REMOVE:
+                logger.info(f"TODO REMOVE self.run_synchron={self.run_synchron}")
             self.pico.run_scenario(
                 scenario=round(value),
                 run_synchron=self.run_synchron,
