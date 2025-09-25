@@ -21,5 +21,8 @@ def scenario(ctx):
 
     ctx.wait_ms(time_ms)
 
-    ctx.IN_disable(True)
     ctx.IN_P_0V0()
+
+    ctx.wait_ms(time_ms)
+
+    ctx.IN_disable(True)

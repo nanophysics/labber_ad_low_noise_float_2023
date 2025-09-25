@@ -69,6 +69,16 @@ class Capturer:
 
     @staticmethod
     def find_first0(array_of_bool: np.ndarray) -> typing.Optional[int]:
+        return Capturer.find_first(array_of_bool=array_of_bool, value_to_find=0)
+
+    @staticmethod
+    def find_first1(array_of_bool: np.ndarray) -> typing.Optional[int]:
+        return Capturer.find_first(array_of_bool=array_of_bool, value_to_find=1)
+
+    @staticmethod
+    def find_first(
+        array_of_bool: np.ndarray, value_to_find: int
+    ) -> typing.Optional[int]:
         """
         Returns the index of the first '0'.
         Returns None if no '0' found.
@@ -82,46 +92,31 @@ class Capturer:
         2
         """
         if TODO_REMOVE:
-            logger.info(f"TOBE REMOVE find_first0({len(array_of_bool)})")
+            logger.info(
+                f"TOBE REMOVE find_first({len(array_of_bool)} value_to_find={value_to_find})"
+            )
         if len(array_of_bool) == 0:
             if TODO_REMOVE:
-                logger.info(f"TOBE REMOVE find_first0({len(array_of_bool)}) A")
+                logger.info(
+                    f"TOBE REMOVE find_first({len(array_of_bool)}) value_to_find={value_to_find}) A"
+                )
             return None
 
         # Find first '0'
-        array0 = np.nonzero(array_of_bool == 0)[0]
-        if len(array0) == 0:
+        array_nonzero = np.nonzero(array_of_bool == value_to_find)[0]
+        if len(array_nonzero) == 0:
             if TODO_REMOVE:
-                logger.info(f"TOBE REMOVE find_first0({len(array_of_bool)}) B")
+                logger.info(
+                    f"TOBE REMOVE find_first({len(array_of_bool)}) value_to_find={value_to_find}) B"
+                )
             return None
 
-        idx0_first0 = int(array0[0])
+        idx0_first = int(array_nonzero[0])
         if TODO_REMOVE:
             logger.info(
-                f"TOBE REMOVE find_first0({len(array_of_bool)}) C idx0_first0={idx0_first0}"
+                f"TOBE REMOVE find_first({len(array_of_bool)}) value_to_find={value_to_find}) C idx0_first0={idx0_first}"
             )
-        return idx0_first0
-
-    @staticmethod
-    def find_first1(array_of_bool: np.ndarray) -> typing.Optional[int]:
-        """
-        Returns the index of the first '1'.
-        Returns None if no '1' found.
-        """
-        # find first '1'
-        array1 = np.nonzero(array_of_bool == 1)[0]
-        if len(array1) == 0:
-            if TODO_REMOVE:
-                logger.info(f"TOBE REMOVE find_first1({len(array_of_bool)}) D")
-            return None
-
-        # Raising edge detected
-        idx0_first1 = int(array1[0])
-        if TODO_REMOVE:
-            logger.info(
-                f"TOBE REMOVE find_first1({len(array_of_bool)}) D idx0_first1={idx0_first1}"
-            )
-        return idx0_first1
+        return idx0_first
 
     def limit_begin(self, idx0: int) -> None:
         self.IN_disable = self.IN_disable[idx0:]
