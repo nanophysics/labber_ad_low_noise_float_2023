@@ -17,6 +17,7 @@ from ad_low_noise_float_2023.constants import PcbParams, RegisterFilter1
 from ad_utils import CHANNEL_VOLTAGE, CHANNEL_T, CHANNEL_DISABLE
 
 TICK_INTERVAL_S = 0.5
+SAMPLE_COUNT_PRE_POST = 3
 
 logger = logging.getLogger("LabberDriver")
 logger_ad = logging.getLogger(LOGGER_NAME)
@@ -89,7 +90,7 @@ class Capturer:
             logger.info(f"TOBE REMOVE find_first0({len(array_of_bool)}) B")
             return None
 
-        idx0_first0 = array0[0]
+        idx0_first0 = int(array0[0])
         logger.info(
             f"TOBE REMOVE find_first0({len(array_of_bool)}) C idx0_first0={idx0_first0}"
         )
@@ -108,7 +109,7 @@ class Capturer:
             return None
 
         # Raising edge detected
-        idx0_first1 = array1[0]
+        idx0_first1 = int(array1[0])
         logger.info(
             f"TOBE REMOVE find_first1({len(array_of_bool)}) D idx0_first1={idx0_first1}"
         )
@@ -124,11 +125,22 @@ class Capturer:
         self.IN_t = self.IN_t[:idx0]
         self.IN_voltage = self.IN_voltage[:idx0]
 
+    def get_slice(self, from_idx0: int, to_idx0: int) -> Capturer:
+        assert isinstance(from_idx0, int)
+        assert isinstance(to_idx0, int)
+        return Capturer(
+            IN_voltage=self.IN_voltage[from_idx0:to_idx0],
+            IN_disable=self.IN_disable[from_idx0:to_idx0],
+            IN_t=self.IN_t[from_idx0:to_idx0],
+        )
+
 
 @dataclasses.dataclass
 class Acquistion:
     state: State = State.ARMED
     capturer: typing.Optional[Capturer] = None
+    capturer_pre: typing.Optional[Capturer] = None
+    capturer_post: typing.Optional[Capturer] = None
     time_armed_start_s: float = time.monotonic()
     done_event = threading.Event()
     lock = threading.Lock()
@@ -146,7 +158,7 @@ class Acquistion:
         self._sps = register_filter1.SPS
         self._update_sps()
 
-    def _update_sps(self)->None:
+    def _update_sps(self) -> None:
         self._duration_max_sample = int(self._duration_max_s * self._sps)
 
     @property
@@ -169,6 +181,8 @@ class Acquistion:
         """
         with self.lock:
             self.capturer = None
+            self.capturer_pre = None
+            self.capturer_post = None
             self.out_timeout = False
             self.out_failing = False
             self.out_raising = False
@@ -178,6 +192,12 @@ class Acquistion:
             self.state = State.CAPTURING
             self.done_event.clear()
         self.done_event.wait()
+
+        logger.info(f"    {len(self.capturer.IN_voltage)}samples")
+        logger.info(f"    {self._sps:0.0f}SPS")
+        logger.info(f"    out_timeout={self.out_timeout}")
+        logger.info(f"    out_failing={self.out_failing} out_failing_s={self.out_failing_s:0.3f}s")
+        logger.info(f"    out_raising={self.out_enabled_s} out_failing_s={self.out_enabled_s:0.3f}s")
 
     # def start(self, measurements: MeasurementSequence, idx0_start: int) -> None:
     #     with self.lock:
@@ -211,19 +231,28 @@ class Acquistion:
     #         )
 
     def found_raising_edge(self) -> bool:
+        if self.capturer_pre is None:
+            idx0 = self.capturer.find_first0(self.capturer.IN_disable)
+            if idx0 is not None:
+                self.capturer_pre = self.capturer.get_slice(
+                    from_idx0=idx0 - SAMPLE_COUNT_PRE_POST, to_idx0=idx0
+                )
+                self.out_failing = True
+                self.out_failing_s = idx0 / self._sps
+                logger.info(f"TODO REMOVE idx0={idx0} self._sps={self._sps} self.out_failing_s={self.out_failing_s}")
+                return False
+
         self.out_timeout = len(self.capturer.IN_disable) > self._duration_max_sample
         if self.out_timeout:
-            logger.info(f"TIMEOUT {len(self.capturer.IN_disable)}({self._duration_max_sample})samples {self.duration_max_s:0.3f}s {self._sps}SPS")
+            logger.info(
+                f"TIMEOUT {len(self.capturer.IN_disable)}({self._duration_max_sample})samples {self.duration_max_s:0.3f}s {self._sps}SPS"
+            )
             with self.lock:
                 self.state = State.ARMED
                 self._done()
             logger.info("found_raising_edge)")
             return True
         return False
-
-        idx0 = self.capturer.find_first0(self.capturer.IN_disable)
-        if idx0 is None:
-            return False
 
         # self.capturer.limit_begin(max(0, idx0-5))
         self.capturer.limit_begin(idx0)

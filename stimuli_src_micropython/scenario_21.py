@@ -1,5 +1,8 @@
 def scenario(ctx):
     time_ms = 500
+
+    ctx.wait_ms(time_ms)
+
     ctx.IN_disable(False)
     
     ctx.wait_ms(time_ms)
