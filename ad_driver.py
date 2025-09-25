@@ -8,6 +8,7 @@ import InstrumentDriver  # pylint: disable=import-error
 import numpy as np
 
 from ad_low_noise_float_2023.ad import LOGGER_NAME
+from ad_low_noise_float_2023.constants import PcbParams, RegisterFilter1
 
 import ad_utils
 import ad_thread
@@ -33,7 +34,6 @@ class Driver(InstrumentDriver.InstrumentWorker):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._thread: typing.Optional[ad_thread.AdThread] = None
-        self.dt: float = 1.0
         # self._thread: AMI430_thread.VisaThread = None
         # self._ramping_required = True
         self.dict_channels = {ch.label: ch for ch in ad_utils.CHANNELS}
@@ -109,7 +109,7 @@ class Driver(InstrumentDriver.InstrumentWorker):
                 self.wait_trigger()
 
             # return correct data
-            return quant.getTraceDict(channel.data, dt=self.dt)
+            return quant.getTraceDict(channel.data, dt=self._thread.dt)
 
         # just return the quantity value
         return quant.getValue()

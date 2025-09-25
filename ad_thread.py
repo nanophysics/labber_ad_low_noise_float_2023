@@ -188,12 +188,12 @@ class Acquistion:
     #         )
 
     def found_raising_edge(self) -> bool:
-        done = len(self.capturer.IN_disable) > 800_000
+        done = len(self.capturer.IN_disable) > 400_000
         if done:
             with self.lock:
                 self.state = State.ARMED
                 self._done()
-            logger.info(f"found_raising_edge)")
+            logger.info("found_raising_edge)")
             return True
         return False
 
@@ -243,6 +243,7 @@ class AdThread(threading.Thread):
         self._aquisition = Acquistion()
         self._stopping = False
         self.duration_max_s = 5.0
+        self.dt: float = 1.0
 
     def run(self):
         """
@@ -272,7 +273,9 @@ class AdThread(threading.Thread):
             self.ad_needs_reconnect = False
             # Read the jumper settings
             logger.info(f"TODO REMOVE self.ad.decoder.size()={self.ad.decoder.size()} Bytes")
+            logger.info("connect(): Start reconnect to update SPS.")
             self.ad.connect(pcb_params=pcb_params)
+            logger.info("connect(): Done reconnect to update SPS.")
             settings_program = self.ad.pcb_status.settings["PROGRAM"]
             REQUIRED_VERSION = "ad_low_noise_float_2023(0.3.8)"
             if settings_program < REQUIRED_VERSION:
@@ -471,9 +474,12 @@ class AdThread(threading.Thread):
         Returns None if quant.name does not match.
         """
         if quant_name == "Sample rate SPS":
+            before = self.register_filter1
             self.register_filter1 = RegisterFilter1.factory(value)
             assert isinstance(self.register_filter1, RegisterFilter1)
-            self.ad_needs_reconnect = True
+            if before != self.register_filter1:
+                logger.info(f"SPS changed from {before.name} to {self.register_filter1.name}: Requires reconnect to the AD pico.")
+                self.ad_needs_reconnect = True
             return value
 
         if quant_name == "duration max s":
@@ -488,6 +494,9 @@ class AdThread(threading.Thread):
     def get_quantity_sync(self, quant):
         if quant.name == "Input range":
             return self.ad.pcb_status.gain_from_jumpers
+
+        if quant.name == "Sample rate SPS":
+            return self.register_filter1.name
 
         if quant.name == "duration max s":
             return self.duration_max_s
