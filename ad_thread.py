@@ -165,9 +165,9 @@ class Acquistion:
     lock = threading.Lock()
     _sps: float = 1.0
     out_timeout: bool = False
-    out_failing: bool = False
+    out_falling: bool = False
     out_raising: bool = False
-    out_failing_s: float = 0.0
+    out_falling_s: float = 0.0
     out_enabled_s: float = 0.0
     _duration_max_s = 4.2
     _duration_max_sample = 42
@@ -202,9 +202,9 @@ class Acquistion:
             self.capturer = None
             self.capturer_pre = None
             self.out_timeout = False
-            self.out_failing = False
+            self.out_falling = False
             self.out_raising = False
-            self.out_failing_s = 0.0
+            self.out_falling_s = 0.0
             self.out_enabled_s = 0.0
             self.time_armed_start_s: float = time.monotonic()
             self.state = State.CAPTURING
@@ -215,21 +215,11 @@ class Acquistion:
         logger.info(f"    {self._sps:0.0f}SPS")
         logger.info(f"    out_timeout={self.out_timeout}")
         logger.info(
-            f"    out_failing={self.out_failing} out_failing_s={self.out_failing_s:0.3f}s"
+            f"    out_falling={self.out_falling} out_falling_s={self.out_falling_s:0.3f}s"
         )
         logger.info(
-            f"    out_raising={self.out_enabled_s} out_failing_s={self.out_enabled_s:0.3f}s"
+            f"    out_raising={self.out_raising} out_enabled_s={self.out_enabled_s:0.3f}s"
         )
-
-    # def start(self, measurements: MeasurementSequence, idx0_start: int) -> None:
-    #     with self.lock:
-    #         self.state = State.CAPTURING
-    #         self.capturer = Capturer.start(
-    #             measurements=measurements, idx0_start=idx0_start
-    #         )
-    #         logger.info(
-    #             f"{self.state.name} start({len(measurements.adc_value_V)}, idx0_start={idx0_start})"
-    #         )
 
     def append(self, measurements: MeasurementSequence, idx0_start: int) -> None:
         with self.lock:
@@ -243,15 +233,6 @@ class Acquistion:
                 self.capturer.append(measurements=measurements)
             logger.info(f"{self.state.name} append({len(measurements.adc_value_V)})")
 
-    # def stop(self, measurements: MeasurementSequence, idx0_end: int) -> None:
-    #     with self.lock:
-    #         self.state = State.IDLE
-    #         self.recorder.stop(measurements=measurements, idx0_end=idx0_end)
-    #         self._done()
-    #         logger.info(
-    #             f"{self.state.name} stop({len(measurements.adc_value_V)}, idx0_end={idx0_end})"
-    #         )
-
     def found_raising_edge(self) -> bool:
         if self.capturer_pre is None:
             # No falling edge yet
@@ -263,10 +244,10 @@ class Acquistion:
                     to_idx0=idx0,
                 )
                 self.capturer.limit_begin(idx0=idx0)
-                self.out_failing = True
-                self.out_failing_s = idx0 / self._sps
+                self.out_falling = True
+                self.out_falling_s = idx0 / self._sps
                 logger.info(
-                    f"Falling edge: idx0={idx0} self._sps={self._sps} self.out_failing_s={self.out_failing_s}"
+                    f"Falling edge: idx0={idx0} self._sps={self._sps} self.out_falling_s={self.out_falling_s:0.3f}s"
                 )
                 return False
         else:
@@ -279,7 +260,7 @@ class Acquistion:
                 self.out_raising = True
                 self.out_enabled_s = idx0 / self._sps
                 logger.info(
-                    f"Raising edge: idx0={idx0} self._sps={self._sps} self.out_enabled_s={self.out_enabled_s}"
+                    f"Raising edge: idx0={idx0} self._sps={self._sps} self.out_enabled_s={self.out_enabled_s:0.3f}s"
                 )
                 with self.lock:
                     self.state = State.ARMED
@@ -510,14 +491,14 @@ class AdThread(threading.Thread):
         if quant.name == "out_timeout":
             return self._aquisition.out_timeout
 
-        if quant.name == "out_failing":
-            return self._aquisition.out_failing
+        if quant.name == "out_falling":
+            return self._aquisition.out_falling
 
         if quant.name == "out_raising":
             return self._aquisition.out_raising
 
-        if quant.name == "out_failing_s":
-            return self._aquisition.out_failing_s
+        if quant.name == "out_falling_s":
+            return self._aquisition.out_falling_s
 
         if quant.name == "out_enabled_s":
             return self._aquisition.out_enabled_s
