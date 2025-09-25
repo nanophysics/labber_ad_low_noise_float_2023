@@ -19,6 +19,10 @@ Logging AD: INFO
 
 ![](design_is_FirstCall/30_step_configuration.png)
 
+![](design_is_FirstCall/40_log_viewer_config.png)
+
+![](design_is_FirstCall/50_log_viewer_traces.png)
+
 ```
 INFO:LabberDriver:performGetValue('IN_voltage') FIRST
 INFO:LabberDriver:performGetValue('IN_t')

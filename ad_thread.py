@@ -16,8 +16,11 @@ from ad_low_noise_float_2023.ad import (
 from ad_low_noise_float_2023.constants import PcbParams, RegisterFilter1
 from ad_utils import CHANNEL_VOLTAGE, CHANNEL_T, CHANNEL_DISABLE
 
-TICK_INTERVAL_S = 0.5
-SAMPLE_COUNT_PRE_POST = 1
+ADD_PRE_POST_SAMPLE = True
+"""
+Add a sample before the falling edge and a sample after the raising edge.
+If not set, IN_disable looks very boring... (all samples are 0)
+"""
 
 TODO_REMOVE = False
 
@@ -77,7 +80,7 @@ class Capturer:
 
     @staticmethod
     def find_first(
-        array_of_bool: np.ndarray, value_to_find: int
+        array_of_bool: np.ndarray, value_to_find: int,
     ) -> typing.Optional[int]:
         """
         Returns the index of the first '0'.
@@ -128,33 +131,11 @@ class Capturer:
         self.IN_t = self.IN_t[:idx0]
         self.IN_voltage = self.IN_voltage[:idx0]
 
-    def insert_begin(self, pre: Capturer) -> None:
-        assert isinstance(pre, Capturer)
-
-        len_pre = len(pre.IN_disable)
-        len_previous = len(self.IN_disable)
-        self.IN_voltage = np.concatenate((pre.IN_voltage, self.IN_voltage))
-        self.IN_disable = np.concatenate((pre.IN_disable, self.IN_disable))
-        self.IN_t = np.concatenate((pre.IN_t, self.IN_t))
-        len_after = len(self.IN_disable)
-        assert len_pre + len_previous == len_after, (len_pre, len_previous, len_after)
-
-    def get_slice(self, from_idx0: int, to_idx0: int) -> Capturer:
-        assert isinstance(from_idx0, int)
-        assert isinstance(to_idx0, int)
-        return Capturer(
-            IN_voltage=self.IN_voltage[from_idx0:to_idx0],
-            IN_disable=self.IN_disable[from_idx0:to_idx0],
-            IN_t=self.IN_t[from_idx0:to_idx0],
-        )
-
 
 @dataclasses.dataclass
 class Acquistion:
     state: State = State.ARMED
     capturer: typing.Optional[Capturer] = None
-    capturer_pre: typing.Optional[Capturer] = None
-    capturer_post: typing.Optional[Capturer] = None
     time_armed_start_s: float = time.monotonic()
     done_event = threading.Event()
     lock = threading.Lock()
@@ -195,7 +176,6 @@ class Acquistion:
         """
         with self.lock:
             self.capturer = None
-            self.capturer_pre = None
             self.out_timeout = False
             self.out_falling = False
             self.out_raising = False
@@ -229,16 +209,15 @@ class Acquistion:
             logger.info(f"{self.state.name} append({len(measurements.adc_value_V)})")
 
     def found_raising_edge(self) -> bool:
-        if self.capturer_pre is None:
+        if not self.out_falling:
             # No falling edge yet
             idx0 = self.capturer.find_first0(self.capturer.IN_disable)
             if idx0 is not None:
                 # We found a falling edge
-                self.capturer_pre = self.capturer.get_slice(
-                    from_idx0=idx0 - SAMPLE_COUNT_PRE_POST,
-                    to_idx0=idx0,
-                )
-                self.capturer.limit_begin(idx0=idx0)
+                self.capturer.limit_begin(idx0=idx0 - (1 if ADD_PRE_POST_SAMPLE else 0))
+                if ADD_PRE_POST_SAMPLE:
+                    # Change the value temporarely to allow triggering of the raising edge
+                    self.capturer.IN_disable[0] = False
                 self.out_falling = True
                 self.out_falling_s = idx0 / self._sps
                 logger.info(
@@ -250,8 +229,9 @@ class Acquistion:
             idx0 = self.capturer.find_first1(self.capturer.IN_disable)
             if idx0 is not None:
                 # We found a raising edge
-                self.capturer.limit_end(idx0=idx0 + SAMPLE_COUNT_PRE_POST)
-                self.capturer.insert_begin(self.capturer_pre)
+                if ADD_PRE_POST_SAMPLE:
+                    self.capturer.IN_disable[0] = True
+                self.capturer.limit_end(idx0=idx0 + (1 if ADD_PRE_POST_SAMPLE else 0))
                 self.out_raising = True
                 self.out_enabled_s = idx0 / self._sps
                 logger.info(
@@ -264,6 +244,8 @@ class Acquistion:
 
         self.out_timeout = len(self.capturer.IN_disable) > self._duration_max_sample
         if self.out_timeout:
+            if ADD_PRE_POST_SAMPLE and self.out_falling:
+                self.capturer.IN_disable[0] = True
             logger.info(
                 f"TIMEOUT {len(self.capturer.IN_disable)}({self._duration_max_sample})samples {self.duration_max_s:0.3f}s {self._sps}SPS"
             )
@@ -271,6 +253,7 @@ class Acquistion:
                 self.state = State.ARMED
                 self._done()
             return True
+
         return False
 
         # self.capturer.limit_begin(max(0, idx0-5))
