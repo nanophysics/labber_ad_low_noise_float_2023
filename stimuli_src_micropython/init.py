@@ -23,6 +23,9 @@ class CtxBase:
     def IN_P_0V7(self) -> None:
         pass
 
+    def IN_P_0V7_t_toggle(self) -> None:
+        pass
+
     def IN_P_1V4(self) -> None:
         pass
 
@@ -55,6 +58,15 @@ class Ctx(CtxBase):
         self.log("  IN_P_0V7()")
         pin_spannung_0.value(0)
         pin_spannung_1.value(1)
+
+    def IN_P_0V7_t_toggle(self) -> None:
+        self.log("  IN_P_0V7_t_toggle()")
+        pin_spannung_0.value(0)
+        pin_spannung_1.value(0)
+        pin_IN_t.toggle()
+        pin_spannung_1.value(1)
+        pin_IN_t.toggle()
+        pin_spannung_1.value(0)
 
     def IN_P_1V4(self) -> None:
         self.log("  IN_P_1V4()")

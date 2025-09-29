@@ -140,11 +140,11 @@ class Acquistion:
     done_event = threading.Event()
     lock = threading.Lock()
     _sps: float = 1.0
-    out_timeout: bool = False
-    out_falling: bool = False
-    out_raising: bool = False
-    out_falling_s: float = 0.0
-    out_enabled_s: float = 0.0
+    timeout_detected: bool = False
+    enable_start_detected: bool = False
+    enable_end_detected: bool = False
+    enable_start_s: float = 0.0
+    enable_s: float = 0.0
     _duration_max_s = 4.2
     _duration_max_sample = 42
 
@@ -176,11 +176,11 @@ class Acquistion:
         """
         with self.lock:
             self.capturer = None
-            self.out_timeout = False
-            self.out_falling = False
-            self.out_raising = False
-            self.out_falling_s = 0.0
-            self.out_enabled_s = 0.0
+            self.timeout_detected = False
+            self.enable_start_detected = False
+            self.enable_end_detected = False
+            self.enable_start_s = 0.0
+            self.enable_s = 0.0
             self.time_armed_start_s: float = time.monotonic()
             self.state = State.CAPTURING
             self.done_event.clear()
@@ -188,12 +188,12 @@ class Acquistion:
 
         logger.info(f"    {len(self.capturer.IN_voltage)}samples")
         logger.info(f"    {self._sps:0.0f}SPS")
-        logger.info(f"    out_timeout={self.out_timeout}")
+        logger.info(f"    timeout_detected={self.timeout_detected}")
         logger.info(
-            f"    out_falling={self.out_falling} out_falling_s={self.out_falling_s:0.3f}s"
+            f"    enable_start_detected={self.enable_start_detected} enable_start_s={self.enable_start_s:0.3f}s"
         )
         logger.info(
-            f"    out_raising={self.out_raising} out_enabled_s={self.out_enabled_s:0.3f}s"
+            f"    enable_end_detected={self.enable_end_detected} enable_s={self.enable_s:0.3f}s"
         )
 
     def append(self, measurements: MeasurementSequence, idx0_start: int) -> None:
@@ -209,7 +209,7 @@ class Acquistion:
             logger.info(f"{self.state.name} append({len(measurements.adc_value_V)})")
 
     def found_raising_edge(self) -> bool:
-        if not self.out_falling:
+        if not self.enable_start_detected:
             # No falling edge yet
             idx0 = self.capturer.find_first0(self.capturer.IN_disable)
             if idx0 is not None:
@@ -218,10 +218,10 @@ class Acquistion:
                 if ADD_PRE_POST_SAMPLE:
                     # Change the value temporarely to allow triggering of the raising edge
                     self.capturer.IN_disable[0] = False
-                self.out_falling = True
-                self.out_falling_s = idx0 / self._sps
+                self.enable_start_detected = True
+                self.enable_start_s = idx0 / self._sps
                 logger.info(
-                    f"Falling edge: idx0={idx0} self._sps={self._sps} self.out_falling_s={self.out_falling_s:0.3f}s"
+                    f"Falling edge: idx0={idx0} self._sps={self._sps} self.enable_start_s={self.enable_start_s:0.3f}s"
                 )
                 return False
         else:
@@ -232,19 +232,19 @@ class Acquistion:
                 if ADD_PRE_POST_SAMPLE:
                     self.capturer.IN_disable[0] = True
                 self.capturer.limit_end(idx0=idx0 + (1 if ADD_PRE_POST_SAMPLE else 0))
-                self.out_raising = True
-                self.out_enabled_s = idx0 / self._sps
+                self.enable_end_detected = True
+                self.enable_s = idx0 / self._sps
                 logger.info(
-                    f"Raising edge: idx0={idx0} self._sps={self._sps} self.out_enabled_s={self.out_enabled_s:0.3f}s"
+                    f"Raising edge: idx0={idx0} self._sps={self._sps} self.enable_s={self.enable_s:0.3f}s"
                 )
                 with self.lock:
                     self.state = State.ARMED
                     self._done()
                 return False
 
-        self.out_timeout = len(self.capturer.IN_disable) > self._duration_max_sample
-        if self.out_timeout:
-            if ADD_PRE_POST_SAMPLE and self.out_falling:
+        self.timeout_detected = len(self.capturer.IN_disable) > self._duration_max_sample
+        if self.timeout_detected:
+            if ADD_PRE_POST_SAMPLE and self.enable_start_detected:
                 self.capturer.IN_disable[0] = True
             logger.info(
                 f"TIMEOUT {len(self.capturer.IN_disable)}({self._duration_max_sample})samples {self.duration_max_s:0.3f}s {self._sps}SPS"
@@ -466,20 +466,20 @@ class AdThread(threading.Thread):
         if quant.name == "duration_max_s":
             return self._aquisition.duration_max_s
 
-        if quant.name == "out_timeout":
-            return self._aquisition.out_timeout
+        if quant.name == "timeout_detected":
+            return self._aquisition.timeout_detected
 
-        if quant.name == "out_falling":
-            return self._aquisition.out_falling
+        if quant.name == "enable_start_detected":
+            return self._aquisition.enable_start_detected
 
-        if quant.name == "out_raising":
-            return self._aquisition.out_raising
+        if quant.name == "enable_end_detected":
+            return self._aquisition.enable_end_detected
 
-        if quant.name == "out_falling_s":
-            return self._aquisition.out_falling_s
+        if quant.name == "enable_start_s":
+            return self._aquisition.enable_start_s
 
-        if quant.name == "out_enabled_s":
-            return self._aquisition.out_enabled_s
+        if quant.name == "enable_s":
+            return self._aquisition.enable_s
 
         return None
 
