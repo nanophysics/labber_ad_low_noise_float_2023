@@ -1,0 +1,23 @@
+2025-09-29 18:35:26,109:  Server started, listening on port 9407
+2025-09-29 18:35:26,811:  New connection from ::ffff:127.0.0.1, #54712
+2025-09-29 18:35:27,350:  ::ffff:127.0.0.1, #54712 - Data received: #0, b'["NEW_CLIENT", "CLIENT_EXPERIMENT"]'
+2025-09-29 18:35:34,837:  New connection from ::ffff:127.0.0.1, #54720
+2025-09-29 18:35:36,256:  ::ffff:127.0.0.1, #54720 - Data received: #0, b'["NEW_CLIENT", "CLIENT_MEASUREMENT"]'
+2025-09-29 18:40:01,766:  ::ffff:127.0.0.1, #54720 - Data received: #0, b'["NEW_LOG_AVAILABLE", "C:\\\\Users\\\\maerki\\\\Labber\\\\Data\\\\2025\\\\09\\\\Data_0929\\\\measurement_SPS97656.hdf5"]'
+2025-09-29 18:40:01,767:  ::ffff:127.0.0.1, #54712 - Data sent: #0, b'["NEW_LOG_AVAILABLE", "C:\\\\Users\\\\maerki\\\\Labber\\\\Data\\\\2025\\\\09\\\\Data_0929\\\\measurement_SPS97656.hdf5"]'
+2025-09-29 18:40:01,767:  ::ffff:127.0.0.1, #54720 - Data sent: #0, b'["NEW_LOG_AVAILABLE", "C:\\\\Users\\\\maerki\\\\Labber\\\\Data\\\\2025\\\\09\\\\Data_0929\\\\measurement_SPS97656.hdf5"]'
+2025-09-29 18:40:07,021:  ::ffff:127.0.0.1, #54720 - Data received: #0, b'["SHOW_LOGBROWSER", null]'
+2025-09-29 18:40:14,663:  New connection from ::ffff:127.0.0.1, #53973
+2025-09-29 18:40:14,706:  ::ffff:127.0.0.1, #53973 - Data received: #0, b'["NEW_CLIENT", "CLIENT_BROWSER"]'
+2025-09-29 18:45:54,411:  ::ffff:127.0.0.1, #54720 - Data received: #0, b'["NEW_LOG_AVAILABLE", "C:\\\\Users\\\\maerki\\\\Labber\\\\Data\\\\2025\\\\09\\\\Data_0929\\\\measurement_SPS03052.hdf5"]'
+2025-09-29 18:45:54,412:  ::ffff:127.0.0.1, #54712 - Data sent: #0, b'["NEW_LOG_AVAILABLE", "C:\\\\Users\\\\maerki\\\\Labber\\\\Data\\\\2025\\\\09\\\\Data_0929\\\\measurement_SPS03052.hdf5"]'
+2025-09-29 18:45:54,412:  ::ffff:127.0.0.1, #54720 - Data sent: #0, b'["NEW_LOG_AVAILABLE", "C:\\\\Users\\\\maerki\\\\Labber\\\\Data\\\\2025\\\\09\\\\Data_0929\\\\measurement_SPS03052.hdf5"]'
+2025-09-29 18:45:54,412:  ::ffff:127.0.0.1, #53973 - Data sent: #0, b'["NEW_LOG_AVAILABLE", "C:\\\\Users\\\\maerki\\\\Labber\\\\Data\\\\2025\\\\09\\\\Data_0929\\\\measurement_SPS03052.hdf5"]'
+2025-09-29 18:49:09,977:  ::ffff:127.0.0.1, #53973 - Disconnected
+2025-09-29 18:49:09,978:  Number of open clients: 2
+2025-09-29 18:49:12,199:  ::ffff:127.0.0.1, #54720 - Disconnected
+2025-09-29 18:49:12,200:  Number of open clients: 1
+2025-09-29 18:49:17,075:  ::ffff:127.0.0.1, #54712 - Data sent: #0, b'["QUIT_EXPERIMENT", null]'
+2025-09-29 18:49:17,076:  ::ffff:127.0.0.1, #54712 - Disconnected
+2025-09-29 18:49:17,082:  Number of open clients: 0
+2025-09-29 18:49:17,085:  Server stopped and closed

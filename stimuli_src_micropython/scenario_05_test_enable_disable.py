@@ -1,9 +1,11 @@
+# Like scenario_04_test_enable_disable.py
+# But 3s delay at the start
 def scenario(ctx):
     time_ms = 100
 
-    ctx.wait_ms(time_ms)
+    ctx.wait_ms(3_000)
 
-    ctx.IN_disable(False)
+    ctx.enable()
     
     ctx.wait_ms(time_ms)
 
@@ -25,4 +27,4 @@ def scenario(ctx):
 
     ctx.wait_ms(time_ms)
 
-    ctx.IN_disable(True)
+    ctx.disable()

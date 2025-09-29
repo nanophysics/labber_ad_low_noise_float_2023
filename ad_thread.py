@@ -80,7 +80,8 @@ class Capturer:
 
     @staticmethod
     def find_first(
-        array_of_bool: np.ndarray, value_to_find: int,
+        array_of_bool: np.ndarray,
+        value_to_find: int,
     ) -> typing.Optional[int]:
         """
         Returns the index of the first '0'.
@@ -147,6 +148,8 @@ class Acquistion:
     enable_s: float = 0.0
     _duration_max_s = 4.2
     _duration_max_sample = 42
+    _IN_disable_first_measurement = 1
+    idx0_start_capturing: int = 0
 
     def set_SPS(self, register_filter1: RegisterFilter1) -> None:
         assert isinstance(register_filter1, RegisterFilter1)
@@ -169,7 +172,7 @@ class Acquistion:
         self.done_event.set()
         self.state = State.ARMED
 
-    def wait_for_acquisition(self) -> None:
+    def wait_for_acquisition(self, idx0_start_capturing: int) -> None:
         """
         We capture a new shot.
         Reset the last shot and get ready.
@@ -183,6 +186,7 @@ class Acquistion:
             self.enable_s = 0.0
             self.time_armed_start_s: float = time.monotonic()
             self.state = State.CAPTURING
+            self.idx0_start_capturing = idx0_start_capturing
             self.done_event.clear()
         self.done_event.wait()
 
@@ -196,56 +200,63 @@ class Acquistion:
             f"    enable_end_detected={self.enable_end_detected} enable_s={self.enable_s:0.3f}s"
         )
 
-    def append(self, measurements: MeasurementSequence, idx0_start: int) -> None:
+    def append(self, measurements: MeasurementSequence) -> None:
         with self.lock:
             if self.capturer is None:
+                idx0_start_capturing = self.idx0_start_capturing
                 self.capturer = Capturer(
-                    IN_voltage=measurements.adc_value_V[idx0_start:],
-                    IN_disable=measurements.IN_disable[idx0_start:],
-                    IN_t=measurements.IN_t[idx0_start:],
+                    IN_voltage=measurements.adc_value_V[idx0_start_capturing:],
+                    IN_disable=measurements.IN_disable[idx0_start_capturing:],
+                    IN_t=measurements.IN_t[idx0_start_capturing:],
                 )
-            else:
-                self.capturer.append(measurements=measurements)
+                logger.info(
+                    f"{self.state.name} append({len(self.capturer.IN_voltage)}) idx0_start_capturing={idx0_start_capturing} of {len(measurements.adc_value_V)}"
+                )
+                return
+
+            self.capturer.append(measurements=measurements)
             logger.info(f"{self.state.name} append({len(measurements.adc_value_V)})")
 
     def found_raising_edge(self) -> bool:
+        if TODO_REMOVE:
+            logger.info(self.capturer.IN_disable)
         if not self.enable_start_detected:
-            # No falling edge yet
+            # No 'falling edge' (enable_start_detected) yet
             idx0 = self.capturer.find_first0(self.capturer.IN_disable)
             if idx0 is not None:
                 # We found a falling edge
                 self.capturer.limit_begin(idx0=idx0 - (1 if ADD_PRE_POST_SAMPLE else 0))
-                if ADD_PRE_POST_SAMPLE:
-                    # Change the value temporarely to allow triggering of the raising edge
-                    self.capturer.IN_disable[0] = False
+                # Change the value temporarely to allow triggering of the raising edge
+                self._IN_disable_first_measurement = self.capturer.IN_disable[0]
+                self.capturer.IN_disable[0] = False
                 self.enable_start_detected = True
                 self.enable_start_s = idx0 / self._sps
                 logger.info(
-                    f"Falling edge: idx0={idx0} self._sps={self._sps} self.enable_start_s={self.enable_start_s:0.3f}s"
+                    f"enable_start_detected: idx0={idx0} self._sps={self._sps} self.enable_start_s={self.enable_start_s:0.3f}s"
                 )
                 return False
         else:
-            # Falling edge detected, now look for raising edge
+            # Falling edge (enable_start_detected), now look for raising edge (enable_end_detected)
             idx0 = self.capturer.find_first1(self.capturer.IN_disable)
             if idx0 is not None:
                 # We found a raising edge
-                if ADD_PRE_POST_SAMPLE:
-                    self.capturer.IN_disable[0] = True
+                self.capturer.IN_disable[0] = self._IN_disable_first_measurement
                 self.capturer.limit_end(idx0=idx0 + (1 if ADD_PRE_POST_SAMPLE else 0))
                 self.enable_end_detected = True
                 self.enable_s = idx0 / self._sps
                 logger.info(
-                    f"Raising edge: idx0={idx0} self._sps={self._sps} self.enable_s={self.enable_s:0.3f}s"
+                    f"enable_end_detected: idx0={idx0} self._sps={self._sps} self.enable_s={self.enable_s:0.3f}s"
                 )
                 with self.lock:
                     self.state = State.ARMED
                     self._done()
                 return False
 
-        self.timeout_detected = len(self.capturer.IN_disable) > self._duration_max_sample
+        self.timeout_detected = (
+            len(self.capturer.IN_disable) > self._duration_max_sample
+        )
         if self.timeout_detected:
-            if ADD_PRE_POST_SAMPLE and self.enable_start_detected:
-                self.capturer.IN_disable[0] = True
+            self.capturer.IN_disable[0] = self._IN_disable_first_measurement
             logger.info(
                 f"TIMEOUT {len(self.capturer.IN_disable)}({self._duration_max_sample})samples {self.duration_max_s:0.3f}s {self._sps}SPS"
             )
@@ -255,23 +266,6 @@ class Acquistion:
             return True
 
         return False
-
-        # self.capturer.limit_begin(max(0, idx0-5))
-        self.capturer.limit_begin(idx0)
-
-        idx0 = self.capturer.find_first1(self.capturer.IN_disable)
-        if idx0 is None:
-            return False
-
-        self.capturer.limit_end(idx0=idx0 + 5)
-        with self.lock:
-            self.state = State.ARMED
-            self._done()
-            logger.info(
-                f"{self.state.name} stop({len(self.capturer.IN_voltage)}, idx0_end={idx0})"
-            )
-        logger.info(f"found_raising_edge idx0={idx0})")
-        return True
 
 
 class AdThread(threading.Thread):
@@ -360,10 +354,7 @@ class AdThread(threading.Thread):
                                 f"TODO REMOVE self.ad.decoder.size()={self.ad.decoder.size()} Bytes"
                             )
 
-                        self._aquisition.append(
-                            measurements=measurements,
-                            idx0_start=self.ad.decoder.size(),
-                        )
+                        self._aquisition.append(measurements=measurements)
                         if self._aquisition.found_raising_edge():
                             return
 
@@ -416,13 +407,29 @@ class AdThread(threading.Thread):
         # self.dict_values_labber_thread_copy = self._visa_station.dict_values.copy()
 
     @synchronized
+    def wait_startup(self) -> None:
+        """
+        Wait for pico to connect and read all configuration
+        """
+        if TODO_REMOVE:
+            logger.info("TODO REMOVE wait_startup() ENTER")
+        next_msg_s = time.monotonic() + 20.0
+        while not self.ad.connected:
+            if next_msg_s > time.monotonic():
+                logger.info("Waiting to be connected...")
+                next_msg_s += 10.0
+            time.sleep(0.5)
+        if TODO_REMOVE:
+            logger.info("TODO REMOVE wait_startup() LEAVE")
+
+    @synchronized
     def wait_measurements(self) -> None:
         """
         This method will until the measurements are acquired.
         """
         if TODO_REMOVE:
             logger.info("TODO REMOVE wait_measurements() ENTER")
-        self._aquisition.wait_for_acquisition()
+        self._aquisition.wait_for_acquisition(idx0_start_capturing=self.ad.decoder.size())
         if TODO_REMOVE:
             logger.info("TODO REMOVE wait_measurements() LEAVE")
 

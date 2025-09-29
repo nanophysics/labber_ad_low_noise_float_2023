@@ -9,6 +9,12 @@ class CtxBase:
         self.do_log = do_log
         self.sleep_total_ms = 0
 
+    def disable(self):
+        self.IN_disable(True)
+
+    def enable(self):
+        self.IN_disable(False)
+
     def IN_disable(self, v):
         "Set logical state"
         assert isinstance(v, bool)
@@ -28,6 +34,10 @@ class CtxBase:
 
     def IN_P_1V4(self) -> None:
         pass
+
+    def wait_s(self, s):
+        assert isinstance(s, (int, float))
+        self.wait_ms(int(1000 * s))
 
     def wait_ms(self, ms):
         assert isinstance(ms, int)
@@ -82,6 +92,18 @@ def scenario(ctx: CtxBase):
     ctx.log("Empty, may be overridden")
 
 
+def second_core_is_ready() -> bool:
+    """
+    return True if second core is ready.
+    If not, wait and try again.
+    """
+    try:
+        _thread.start_new_thread(lambda: None, ())
+        return True
+    except OSError:
+        return False
+
+
 def run_scenario(run_synchron: bool, do_validate: bool, do_log: bool = False):
     assert isinstance(run_synchron, bool)
     assert isinstance(do_validate, bool)
@@ -91,16 +113,12 @@ def run_scenario(run_synchron: bool, do_validate: bool, do_log: bool = False):
     if run_synchron:
         scenario(ctx=ctx)
     else:
-        # Wait for maximum 10s
-        for _ in range(10.0):
-            try:
-                _thread.start_new_thread(lambda: None, ())
-                break
-            except OSError as e:
-                print(f"Wait for second core: {e}")
-                time.sleep(1.0)
+        try:
+            _thread.start_new_thread(scenario, (ctx,))
+        except OSError as e:
+            print(f"Wait for second core: {e}")
+            raise
 
-        _thread.start_new_thread(scenario, (ctx,))
     ctx.log("run_scenario() DONE")
 
 
@@ -113,4 +131,3 @@ pin_spannung_0.value(0)
 pin_spannung_1.value(0)
 pin_IN_disable.value(0)
 pin_IN_t.value(0)
-

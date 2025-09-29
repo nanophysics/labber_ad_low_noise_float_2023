@@ -1,0 +1,1255 @@
+18:35:43,387:  ad_low_noise_float_2023_stimuli - : Open: Operation added, # of ops in queue: 1
+18:35:43,389:  ad_low_noise_float_2023_stimuli - : Open: Driver started
+18:35:43,390:  Connecting to pico...
+18:35:43,907:  ad_low_noise_float_2023 - : Open: Operation added, # of ops in queue: 1
+18:35:43,908:  ad_low_noise_float_2023 - : Open: Driver started
+18:35:43,908:  labber_ad_low_noise_float_2023 Driver
+18:35:43,917:  connect(): Start reconnect to update SPS.
+18:35:43,917:  Waiting to be connected...
+18:35:43,934:  micropython execfile: init.py
+18:35:44,041:  micropython execfile: init.py returned b''
+18:35:44,041:  Connected to pico!
+18:35:44,041:  ad_low_noise_float_2023_stimuli - : Open: Driver finished in 652 ms, # of ops in queue: 0
+18:35:44,049:  ad_low_noise_float_2023_stimuli - : Set config: Operation added, # of ops in queue: 1
+18:35:44,049:  ad_low_noise_float_2023_stimuli - : Set config: Driver started
+18:35:44,049:  performSetValue('Logging', DEBUG)
+18:35:44,049:  Logging severity not implemented yet
+18:35:44,049:  performSetValue('Synchron', ASYNCHRON)
+18:35:44,049:  performSetValue('Scenario', 0.0)
+18:35:44,050:  run_scenario(scenario=0, run_synchron=False, do_validate=False): scenario_00_prepare_enable.py
+18:35:44,051:  micropython execfile: scenario_00_prepare_enable.py
+18:35:44,056:  micropython execfile: scenario_00_prepare_enable.py returned b''
+18:35:44,060:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:35:44,064:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:35:44,064:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:35:44,069:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:35:44,070:  ad_low_noise_float_2023_stimuli - : Set config: Driver finished in 20 ms, # of ops in queue: 0
+18:35:44,420:  Waiting to be connected...
+18:35:44,922:  Waiting to be connected...
+18:35:45,012:  connect(): Done reconnect to update SPS.
+18:35:45,426:  ad_low_noise_float_2023 - : Open: Driver finished in 1518 ms, # of ops in queue: 0
+18:35:45,462:  ad_low_noise_float_2023 - : Set config: Operation added, # of ops in queue: 1
+18:35:45,462:  ad_low_noise_float_2023 - : Set config: Driver started
+18:35:45,463:  performSetValue('Logging Driver', DEBUG -> DEBUG) FIRST 0.00s
+18:35:45,463:  performSetValue('Logging AD', DEBUG -> DEBUG)  0.00s
+18:35:45,463:  performSetValue('duration_max_s', 5.0 -> 5.0)  0.00s
+18:35:45,463:  performSetValue('sample_rate_SPS', SPS_97656 -> SPS_97656)  0.00s
+18:35:45,463:  ad_low_noise_float_2023 - : Set config: Driver finished in 1 ms, # of ops in queue: 0
+18:35:45,509:  ad_low_noise_float_2023 - : Set value: sample_rate_SPS = SPS_97656: Operation added, # of ops in queue: 1
+18:35:45,509:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Operation added, # of ops in queue: 1
+18:35:45,509:  ad_low_noise_float_2023 - : Set value: sample_rate_SPS = SPS_97656: Driver started
+18:35:45,509:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Driver started
+18:35:45,509:  performSetValue('Scenario', 0.0)
+18:35:45,510:  run_scenario(scenario=0, run_synchron=False, do_validate=False): scenario_00_prepare_enable.py
+18:35:45,510:  micropython execfile: scenario_00_prepare_enable.py
+18:35:45,509:  Exception in method "HeaterThread.set_quantity_sync"
+Traceback (most recent call last):
+  File "C:\Projekte\ETH\ETH-labber_ad_low_noise_float_2023\labber_ad_low_noise_float_2023\ad_thread.py", line 42, in wrapper
+    return func(*args, **kwargs)
+  File "C:\Projekte\ETH\ETH-labber_ad_low_noise_float_2023\labber_ad_low_noise_float_2023\ad_thread.py", line 448, in set_quantity_sync
+    self.register_filter1 = RegisterFilter1.factory(value)
+  File "C:\Projekte\ETH\ETH-labber_ad_low_noise_float_2023\gits\ad_low_noise_float_2023_git\src\ad_low_noise_float_2023\constants.py", line 39, in factory
+    assert isinstance(value_text, str)
+AssertionError
+18:35:45,514:  micropython execfile: scenario_00_prepare_enable.py returned b''
+18:35:45,517:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:35:45,521:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:35:45,521:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:35:45,526:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:35:45,526:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Driver finished in 17 ms, # of ops in queue: 0
+18:35:46,029:  ad_low_noise_float_2023 - : Set value: sample_rate_SPS = SPS_97656: Driver finished in 520 ms, # of ops in queue: 0
+18:35:46,030:  An error occurred when sending a value to an instrument.
+
+Instrument name: ad_low_noise_float_2023 (ad_low_noise_float_2023) 
+Address:  
+Quantity: sample_rate_SPS 
+Value: SPS_97656
+
+Unfiltered error message:
+  File "C:\Program Files\Labber\python-labber\multiproc-include\py37\BaseDriver.py", line 451, in processOperation
+    self.performOperation(dOp, callId)
+  File "C:\Program Files\Labber\python-labber\multiproc-include\py37\BaseDriver.py", line 493, in performOperation
+    bWaitForSweepInFunction=dOp['wait_for_sweep'], options=dOp)
+  File "C:\Program Files\Labber\python-labber\multiproc-include\py37\BaseDriver.py", line 800, in _performSetValue
+    return self._performSetValueNoNone(quant, value, 0.0, options)
+  File "C:\Program Files\Labber\python-labber\multiproc-include\py37\BaseDriver.py", line 790, in _performSetValueNoNone
+    quant, value, sweepRate=sweepRate, options=options)
+  File "C:\Projekte\ETH\ETH-labber_ad_low_noise_float_2023\labber_ad_low_noise_float_2023\ad_driver.py", line 77, in performSetValue
+    quant_name=quant.name, value=value
+  File "C:\Projekte\ETH\ETH-labber_ad_low_noise_float_2023\labber_ad_low_noise_float_2023\ad_thread.py", line 42, in wrapper
+    return func(*args, **kwargs)
+  File "C:\Projekte\ETH\ETH-labber_ad_low_noise_float_2023\labber_ad_low_noise_float_2023\ad_thread.py", line 448, in set_quantity_sync
+    self.register_filter1 = RegisterFilter1.factory(value)
+  File "C:\Projekte\ETH\ETH-labber_ad_low_noise_float_2023\gits\ad_low_noise_float_2023_git\src\ad_low_noise_float_2023\constants.py", line 39, in factory
+    assert isinstance(value_text, str)
+
+18:36:22,307:  ad_low_noise_float_2023_stimuli - : Set config: Operation added, # of ops in queue: 1
+18:36:22,307:  ad_low_noise_float_2023_stimuli - : Set config: Driver started
+18:36:22,307:  performSetValue('Logging', DEBUG)
+18:36:22,308:  Logging severity not implemented yet
+18:36:22,308:  performSetValue('Synchron', ASYNCHRON)
+18:36:22,308:  performSetValue('Scenario', 0.0)
+18:36:22,308:  run_scenario(scenario=0, run_synchron=False, do_validate=False): scenario_00_prepare_enable.py
+18:36:22,308:  micropython execfile: scenario_00_prepare_enable.py
+18:36:22,312:  micropython execfile: scenario_00_prepare_enable.py returned b''
+18:36:22,316:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:36:22,320:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:36:22,320:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:36:22,325:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:36:22,325:  ad_low_noise_float_2023_stimuli - : Set config: Driver finished in 18 ms, # of ops in queue: 0
+18:36:22,524:  ad_low_noise_float_2023 - : Open: Operation added, # of ops in queue: 1
+18:36:22,524:  ad_low_noise_float_2023 - : Open: Driver started
+18:36:22,525:  labber_ad_low_noise_float_2023 Driver
+18:36:22,534:  connect(): Start reconnect to update SPS.
+18:36:22,534:  Waiting to be connected...
+18:36:23,049:  Waiting to be connected...
+18:36:23,564:  Waiting to be connected...
+18:36:23,622:  connect(): Done reconnect to update SPS.
+18:36:24,066:  ad_low_noise_float_2023 - : Open: Driver finished in 1541 ms, # of ops in queue: 0
+18:36:24,073:  ad_low_noise_float_2023 - : Set config: Operation added, # of ops in queue: 1
+18:36:24,073:  ad_low_noise_float_2023 - : Set config: Driver started
+18:36:24,073:  performSetValue('Logging Driver', DEBUG -> DEBUG) FIRST 0.00s
+18:36:24,073:  performSetValue('Logging AD', DEBUG -> DEBUG)  0.00s
+18:36:24,074:  performSetValue('duration_max_s', 5.0 -> 5.0)  0.00s
+18:36:24,074:  performSetValue('sample_rate_SPS', SPS_97656 -> SPS_97656)  0.00s
+18:36:24,074:  ad_low_noise_float_2023 - : Set config: Driver finished in 1 ms, # of ops in queue: 0
+18:36:24,119:  ad_low_noise_float_2023 - : Set value: sample_rate_SPS = SPS_97656: Operation added, # of ops in queue: 1
+18:36:24,120:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Operation added, # of ops in queue: 1
+18:36:24,120:  ad_low_noise_float_2023 - : Set value: sample_rate_SPS = SPS_97656: Driver started
+18:36:24,120:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Driver started
+18:36:24,120:  performSetValue('Scenario', 0.0)
+18:36:24,120:  run_scenario(scenario=0, run_synchron=False, do_validate=False): scenario_00_prepare_enable.py
+18:36:24,120:  micropython execfile: scenario_00_prepare_enable.py
+18:36:24,120:  Exception in method "HeaterThread.set_quantity_sync"
+Traceback (most recent call last):
+  File "C:\Projekte\ETH\ETH-labber_ad_low_noise_float_2023\labber_ad_low_noise_float_2023\ad_thread.py", line 42, in wrapper
+    return func(*args, **kwargs)
+  File "C:\Projekte\ETH\ETH-labber_ad_low_noise_float_2023\labber_ad_low_noise_float_2023\ad_thread.py", line 448, in set_quantity_sync
+    self.register_filter1 = RegisterFilter1.factory(value)
+  File "C:\Projekte\ETH\ETH-labber_ad_low_noise_float_2023\gits\ad_low_noise_float_2023_git\src\ad_low_noise_float_2023\constants.py", line 39, in factory
+    assert isinstance(value_text, str), repr(value_text)
+AssertionError: 0.0
+18:36:24,125:  micropython execfile: scenario_00_prepare_enable.py returned b''
+18:36:24,128:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:36:24,132:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:36:24,132:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:36:24,137:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:36:24,137:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Driver finished in 17 ms, # of ops in queue: 0
+18:36:24,640:  ad_low_noise_float_2023 - : Set value: sample_rate_SPS = SPS_97656: Driver finished in 520 ms, # of ops in queue: 0
+18:36:24,642:  An error occurred when sending a value to an instrument.
+
+Instrument name: ad_low_noise_float_2023 (ad_low_noise_float_2023) 
+Address:  
+Quantity: sample_rate_SPS 
+Value: SPS_97656
+
+Error message:
+0.0
+
+Unfiltered error message:
+  File "C:\Program Files\Labber\python-labber\multiproc-include\py37\BaseDriver.py", line 451, in processOperation
+    self.performOperation(dOp, callId)
+  File "C:\Program Files\Labber\python-labber\multiproc-include\py37\BaseDriver.py", line 493, in performOperation
+    bWaitForSweepInFunction=dOp['wait_for_sweep'], options=dOp)
+  File "C:\Program Files\Labber\python-labber\multiproc-include\py37\BaseDriver.py", line 800, in _performSetValue
+    return self._performSetValueNoNone(quant, value, 0.0, options)
+  File "C:\Program Files\Labber\python-labber\multiproc-include\py37\BaseDriver.py", line 790, in _performSetValueNoNone
+    quant, value, sweepRate=sweepRate, options=options)
+  File "C:\Projekte\ETH\ETH-labber_ad_low_noise_float_2023\labber_ad_low_noise_float_2023\ad_driver.py", line 77, in performSetValue
+    quant_name=quant.name, value=value
+  File "C:\Projekte\ETH\ETH-labber_ad_low_noise_float_2023\labber_ad_low_noise_float_2023\ad_thread.py", line 42, in wrapper
+    return func(*args, **kwargs)
+  File "C:\Projekte\ETH\ETH-labber_ad_low_noise_float_2023\labber_ad_low_noise_float_2023\ad_thread.py", line 448, in set_quantity_sync
+    self.register_filter1 = RegisterFilter1.factory(value)
+  File "C:\Projekte\ETH\ETH-labber_ad_low_noise_float_2023\gits\ad_low_noise_float_2023_git\src\ad_low_noise_float_2023\constants.py", line 39, in factory
+    assert isinstance(value_text, str), repr(value_text)
+
+18:39:22,017:  ad_low_noise_float_2023_stimuli - : Set config: Operation added, # of ops in queue: 1
+18:39:22,017:  ad_low_noise_float_2023_stimuli - : Set config: Driver started
+18:39:22,017:  performSetValue('Logging', DEBUG)
+18:39:22,017:  Logging severity not implemented yet
+18:39:22,017:  performSetValue('Synchron', ASYNCHRON)
+18:39:22,018:  performSetValue('Scenario', 0.0)
+18:39:22,018:  run_scenario(scenario=0, run_synchron=False, do_validate=False): scenario_00_prepare_enable.py
+18:39:22,018:  micropython execfile: scenario_00_prepare_enable.py
+18:39:22,022:  micropython execfile: scenario_00_prepare_enable.py returned b''
+18:39:22,025:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:39:22,029:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:39:22,029:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:39:22,034:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:39:22,034:  ad_low_noise_float_2023_stimuli - : Set config: Driver finished in 17 ms, # of ops in queue: 0
+18:39:22,187:  ad_low_noise_float_2023 - : Open: Operation added, # of ops in queue: 1
+18:39:22,189:  ad_low_noise_float_2023 - : Open: Driver started
+18:39:22,189:  labber_ad_low_noise_float_2023 Driver
+18:39:22,197:  connect(): Start reconnect to update SPS.
+18:39:22,197:  Waiting to be connected...
+18:39:22,710:  Waiting to be connected...
+18:39:23,225:  Waiting to be connected...
+18:39:23,283:  connect(): Done reconnect to update SPS.
+18:39:23,732:  ad_low_noise_float_2023 - : Open: Driver finished in 1543 ms, # of ops in queue: 0
+18:39:23,742:  ad_low_noise_float_2023 - : Set config: Operation added, # of ops in queue: 1
+18:39:23,742:  ad_low_noise_float_2023 - : Set config: Driver started
+18:39:23,742:  performSetValue('Logging Driver', DEBUG -> DEBUG) FIRST 0.00s
+18:39:23,743:  performSetValue('Logging AD', DEBUG -> DEBUG)  0.00s
+18:39:23,743:  performSetValue('duration_max_s', 5.0 -> 5.0)  0.00s
+18:39:23,743:  performSetValue('sample_rate_SPS', SPS_97656 -> SPS_97656)  0.00s
+18:39:23,743:  ad_low_noise_float_2023 - : Set config: Driver finished in 1 ms, # of ops in queue: 0
+18:39:23,785:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Operation added, # of ops in queue: 1
+18:39:23,785:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Driver started
+18:39:23,785:  performSetValue('Scenario', 0.0)
+18:39:23,785:  run_scenario(scenario=0, run_synchron=False, do_validate=False): scenario_00_prepare_enable.py
+18:39:23,786:  micropython execfile: scenario_00_prepare_enable.py
+18:39:23,790:  micropython execfile: scenario_00_prepare_enable.py returned b''
+18:39:23,794:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:39:23,798:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:39:23,798:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:39:23,803:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:39:23,803:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Driver finished in 18 ms, # of ops in queue: 0
+18:39:23,817:  ad_low_noise_float_2023 - : Get value: IN_disable: Operation added, # of ops in queue: 1
+18:39:23,817:  ad_low_noise_float_2023 - : Get value: IN_t: Operation added, # of ops in queue: 2
+18:39:23,817:  ad_low_noise_float_2023 - : Get value: IN_voltage: Operation added, # of ops in queue: 3
+18:39:23,818:  ad_low_noise_float_2023 - : Get value: Input range: Operation added, # of ops in queue: 4
+18:39:23,818:  ad_low_noise_float_2023 - : Get value: timeout_detected: Operation added, # of ops in queue: 5
+18:39:23,818:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Operation added, # of ops in queue: 6
+18:39:23,818:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Operation added, # of ops in queue: 7
+18:39:23,818:  ad_low_noise_float_2023 - : Get value: enable_start_s: Operation added, # of ops in queue: 8
+18:39:23,818:  ad_low_noise_float_2023 - : Get value: enable_s: Operation added, # of ops in queue: 9
+18:39:23,818:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver started
+18:39:23,818:  performGetValue('IN_disable') FIRST
+18:39:24,288:  CAPTURING append(1000) idx0_start_capturing=0 of 1000
+18:39:24,290:  enable_start_detected: idx0=0 self._sps=97656 self.enable_start_s=0.000s
+18:39:24,290:  CAPTURING append(30000)
+18:39:24,290:  CAPTURING append(30000)
+18:39:24,291:  CAPTURING append(30000)
+18:39:25,305:  CAPTURING append(30000)
+18:39:25,305:  CAPTURING append(30000)
+18:39:25,306:  CAPTURING append(30000)
+18:39:26,320:  CAPTURING append(30000)
+18:39:26,321:  CAPTURING append(30000)
+18:39:26,322:  CAPTURING append(30000)
+18:39:27,331:  CAPTURING append(30000)
+18:39:27,332:  CAPTURING append(30000)
+18:39:27,334:  CAPTURING append(30000)
+18:39:27,334:  CAPTURING append(30000)
+18:39:28,350:  CAPTURING append(30000)
+18:39:28,352:  CAPTURING append(30000)
+18:39:28,353:  CAPTURING append(30000)
+18:39:29,366:  CAPTURING append(30000)
+18:39:29,367:  TIMEOUT 510001(488280)samples 5.000s 97656SPS
+18:39:29,368:      510001samples
+18:39:29,368:      97656SPS
+18:39:29,368:      timeout_detected=True
+18:39:29,368:      enable_start_detected=True enable_start_s=0.000s
+18:39:29,368:      enable_end_detected=False enable_s=0.000s
+18:39:29,369:  performGetValue('IN_disable') returned 5.55s
+18:39:29,369:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver finished in 5551 ms, # of ops in queue: 8
+18:39:29,369:  ad_low_noise_float_2023 - : Get value: IN_t: Driver started
+18:39:29,369:  performGetValue('IN_t') 
+18:39:29,369:  performGetValue('IN_t') returned 0.00s
+18:39:29,370:  ad_low_noise_float_2023 - : Get value: IN_t: Driver finished in 1 ms, # of ops in queue: 7
+18:39:29,370:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver started
+18:39:29,370:  performGetValue('IN_voltage') 
+18:39:29,370:  performGetValue('IN_voltage') returned 0.00s
+18:39:29,372:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver finished in 0 ms, # of ops in queue: 6
+18:39:29,372:  ad_low_noise_float_2023 - : Get value: Input range: Driver started
+18:39:29,374:  performGetValue('Input range') 
+18:39:29,374:  performGetValue('Input range') returned 0.00s
+18:39:29,374:  ad_low_noise_float_2023 - : Get value: Input range: Driver finished in 0 ms, # of ops in queue: 5
+18:39:29,374:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver started
+18:39:29,374:  performGetValue('timeout_detected') 
+18:39:29,374:  performGetValue('timeout_detected') returned 0.00s
+18:39:29,374:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver finished in 0 ms, # of ops in queue: 4
+18:39:29,374:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver started
+18:39:29,375:  performGetValue('enable_start_detected') 
+18:39:29,375:  performGetValue('enable_start_detected') returned 0.00s
+18:39:29,375:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver finished in 0 ms, # of ops in queue: 3
+18:39:29,375:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver started
+18:39:29,375:  performGetValue('enable_end_detected') 
+18:39:29,375:  performGetValue('enable_end_detected') returned 0.00s
+18:39:29,375:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver finished in 0 ms, # of ops in queue: 2
+18:39:29,375:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver started
+18:39:29,376:  performGetValue('enable_start_s') 
+18:39:29,376:  performGetValue('enable_start_s') returned 0.00s
+18:39:29,376:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver finished in 0 ms, # of ops in queue: 1
+18:39:29,376:  ad_low_noise_float_2023 - : Get value: enable_s: Driver started
+18:39:29,376:  performGetValue('enable_s') 
+18:39:29,376:  performGetValue('enable_s') returned 0.00s
+18:39:29,376:  ad_low_noise_float_2023 - : Get value: enable_s: Driver finished in 0 ms, # of ops in queue: 0
+18:39:29,542:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 1 idx: Operation added, # of ops in queue: 1
+18:39:29,543:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 1 idx: Driver started
+18:39:29,543:  performSetValue('Scenario', 1.0)
+18:39:29,543:  run_scenario(scenario=1, run_synchron=False, do_validate=False): scenario_01_test_timeout.py
+18:39:29,543:  micropython execfile: scenario_01_test_timeout.py
+18:39:29,548:  micropython execfile: scenario_01_test_timeout.py returned b''
+18:39:29,552:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:39:29,556:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:39:29,556:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:39:29,560:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:39:29,560:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 1 idx: Driver finished in 18 ms, # of ops in queue: 0
+18:39:29,574:  ad_low_noise_float_2023 - : Get value: IN_disable: Operation added, # of ops in queue: 1
+18:39:29,574:  ad_low_noise_float_2023 - : Get value: IN_t: Operation added, # of ops in queue: 2
+18:39:29,575:  ad_low_noise_float_2023 - : Get value: IN_voltage: Operation added, # of ops in queue: 3
+18:39:29,575:  ad_low_noise_float_2023 - : Get value: Input range: Operation added, # of ops in queue: 4
+18:39:29,575:  ad_low_noise_float_2023 - : Get value: timeout_detected: Operation added, # of ops in queue: 5
+18:39:29,575:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Operation added, # of ops in queue: 6
+18:39:29,575:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Operation added, # of ops in queue: 7
+18:39:29,575:  ad_low_noise_float_2023 - : Get value: enable_start_s: Operation added, # of ops in queue: 8
+18:39:29,575:  ad_low_noise_float_2023 - : Get value: enable_s: Operation added, # of ops in queue: 9
+18:39:29,575:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver started
+18:39:29,575:  performGetValue('IN_disable') FIRST
+18:39:30,381:  CAPTURING append(0) idx0_start_capturing=72933 of 30000
+18:39:30,381:  CAPTURING append(30000)
+18:39:30,381:  enable_start_detected: idx0=0 self._sps=97656 self.enable_start_s=0.000s
+18:39:30,382:  CAPTURING append(30000)
+18:39:30,382:  CAPTURING append(30000)
+18:39:31,386:  CAPTURING append(30000)
+18:39:31,387:  CAPTURING append(30000)
+18:39:31,388:  CAPTURING append(30000)
+18:39:32,398:  CAPTURING append(30000)
+18:39:32,399:  CAPTURING append(30000)
+18:39:32,399:  CAPTURING append(30000)
+18:39:33,406:  CAPTURING append(30000)
+18:39:33,408:  CAPTURING append(30000)
+18:39:33,408:  CAPTURING append(30000)
+18:39:34,415:  CAPTURING append(30000)
+18:39:34,417:  CAPTURING append(30000)
+18:39:34,418:  CAPTURING append(30000)
+18:39:34,419:  CAPTURING append(30000)
+18:39:35,436:  CAPTURING append(30000)
+18:39:35,438:  CAPTURING append(30000)
+18:39:35,438:  TIMEOUT 510001(488280)samples 5.000s 97656SPS
+18:39:35,439:      510001samples
+18:39:35,439:      97656SPS
+18:39:35,439:      timeout_detected=True
+18:39:35,439:      enable_start_detected=True enable_start_s=0.000s
+18:39:35,439:      enable_end_detected=False enable_s=0.000s
+18:39:35,440:  performGetValue('IN_disable') returned 5.86s
+18:39:35,440:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver finished in 5864 ms, # of ops in queue: 8
+18:39:35,440:  ad_low_noise_float_2023 - : Get value: IN_t: Driver started
+18:39:35,440:  performGetValue('IN_t') 
+18:39:35,440:  performGetValue('IN_t') returned 0.00s
+18:39:35,440:  ad_low_noise_float_2023 - : Get value: IN_t: Driver finished in 0 ms, # of ops in queue: 7
+18:39:35,442:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver started
+18:39:35,442:  performGetValue('IN_voltage') 
+18:39:35,442:  performGetValue('IN_voltage') returned 0.00s
+18:39:35,442:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver finished in 0 ms, # of ops in queue: 6
+18:39:35,444:  ad_low_noise_float_2023 - : Get value: Input range: Driver started
+18:39:35,444:  performGetValue('Input range') 
+18:39:35,444:  performGetValue('Input range') returned 0.00s
+18:39:35,444:  ad_low_noise_float_2023 - : Get value: Input range: Driver finished in 0 ms, # of ops in queue: 5
+18:39:35,444:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver started
+18:39:35,445:  performGetValue('timeout_detected') 
+18:39:35,445:  performGetValue('timeout_detected') returned 0.00s
+18:39:35,445:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver finished in 1 ms, # of ops in queue: 4
+18:39:35,445:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver started
+18:39:35,445:  performGetValue('enable_start_detected') 
+18:39:35,445:  performGetValue('enable_start_detected') returned 0.00s
+18:39:35,445:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver finished in 0 ms, # of ops in queue: 3
+18:39:35,446:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver started
+18:39:35,446:  performGetValue('enable_end_detected') 
+18:39:35,446:  performGetValue('enable_end_detected') returned 0.00s
+18:39:35,446:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver finished in 0 ms, # of ops in queue: 2
+18:39:35,446:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver started
+18:39:35,446:  performGetValue('enable_start_s') 
+18:39:35,446:  performGetValue('enable_start_s') returned 0.00s
+18:39:35,446:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver finished in 1 ms, # of ops in queue: 1
+18:39:35,448:  ad_low_noise_float_2023 - : Get value: enable_s: Driver started
+18:39:35,448:  performGetValue('enable_s') 
+18:39:35,448:  performGetValue('enable_s') returned 0.00s
+18:39:35,448:  ad_low_noise_float_2023 - : Get value: enable_s: Driver finished in 0 ms, # of ops in queue: 0
+18:39:35,600:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 2 idx: Operation added, # of ops in queue: 1
+18:39:35,600:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 2 idx: Driver started
+18:39:35,600:  performSetValue('Scenario', 2.0)
+18:39:35,601:  run_scenario(scenario=2, run_synchron=False, do_validate=False): scenario_02_test_enable_end_detected.py
+18:39:35,601:  micropython execfile: scenario_02_test_enable_end_detected.py
+18:39:35,611:  micropython execfile: scenario_02_test_enable_end_detected.py returned b''
+18:39:45,636:  _wait_for_second_core() returned after 10.0s
+18:39:45,636:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:39:45,641:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:39:45,641:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:39:45,645:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:39:45,645:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 2 idx: Driver finished in 10045 ms, # of ops in queue: 0
+18:39:45,660:  ad_low_noise_float_2023 - : Get value: IN_disable: Operation added, # of ops in queue: 1
+18:39:45,661:  ad_low_noise_float_2023 - : Get value: IN_t: Operation added, # of ops in queue: 2
+18:39:45,661:  ad_low_noise_float_2023 - : Get value: IN_voltage: Operation added, # of ops in queue: 3
+18:39:45,661:  ad_low_noise_float_2023 - : Get value: Input range: Operation added, # of ops in queue: 4
+18:39:45,661:  ad_low_noise_float_2023 - : Get value: timeout_detected: Operation added, # of ops in queue: 5
+18:39:45,661:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Operation added, # of ops in queue: 6
+18:39:45,661:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Operation added, # of ops in queue: 7
+18:39:45,661:  ad_low_noise_float_2023 - : Get value: enable_start_s: Operation added, # of ops in queue: 8
+18:39:45,661:  ad_low_noise_float_2023 - : Get value: enable_s: Operation added, # of ops in queue: 9
+18:39:45,661:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver started
+18:39:45,661:  performGetValue('IN_disable') FIRST
+18:39:46,524:  CAPTURING append(0) idx0_start_capturing=32982 of 30000
+18:39:46,525:  CAPTURING append(30000)
+18:39:46,526:  enable_start_detected: idx0=0 self._sps=97656 self.enable_start_s=0.000s
+18:39:46,526:  CAPTURING append(30000)
+18:39:47,537:  CAPTURING append(30000)
+18:39:47,537:  CAPTURING append(30000)
+18:39:47,538:  CAPTURING append(30000)
+18:39:48,545:  CAPTURING append(30000)
+18:39:48,546:  CAPTURING append(9537)
+18:39:48,547:  CAPTURING append(30000)
+18:39:48,548:  enable_end_detected: idx0=159571 self._sps=97656 self.enable_s=1.634s
+18:39:48,548:      159572samples
+18:39:48,548:      97656SPS
+18:39:48,548:      timeout_detected=False
+18:39:48,548:      enable_start_detected=True enable_start_s=0.000s
+18:39:48,549:      enable_end_detected=True enable_s=1.634s
+18:39:48,549:  performGetValue('IN_disable') returned 2.88s
+18:39:48,549:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver finished in 2887 ms, # of ops in queue: 8
+18:39:48,549:  ad_low_noise_float_2023 - : Get value: IN_t: Driver started
+18:39:48,550:  performGetValue('IN_t') 
+18:39:48,550:  performGetValue('IN_t') returned 0.00s
+18:39:48,550:  ad_low_noise_float_2023 - : Get value: IN_t: Driver finished in 1 ms, # of ops in queue: 7
+18:39:48,550:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver started
+18:39:48,551:  performGetValue('IN_voltage') 
+18:39:48,551:  performGetValue('IN_voltage') returned 0.00s
+18:39:48,551:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver finished in 0 ms, # of ops in queue: 6
+18:39:48,552:  ad_low_noise_float_2023 - : Get value: Input range: Driver started
+18:39:48,552:  performGetValue('Input range') 
+18:39:48,552:  performGetValue('Input range') returned 0.00s
+18:39:48,552:  ad_low_noise_float_2023 - : Get value: Input range: Driver finished in 0 ms, # of ops in queue: 5
+18:39:48,552:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver started
+18:39:48,552:  performGetValue('timeout_detected') 
+18:39:48,552:  performGetValue('timeout_detected') returned 0.00s
+18:39:48,553:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver finished in 0 ms, # of ops in queue: 4
+18:39:48,553:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver started
+18:39:48,553:  performGetValue('enable_start_detected') 
+18:39:48,553:  performGetValue('enable_start_detected') returned 0.00s
+18:39:48,553:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver finished in 0 ms, # of ops in queue: 3
+18:39:48,554:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver started
+18:39:48,554:  performGetValue('enable_end_detected') 
+18:39:48,554:  performGetValue('enable_end_detected') returned 0.00s
+18:39:48,554:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver finished in 0 ms, # of ops in queue: 2
+18:39:48,554:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver started
+18:39:48,554:  performGetValue('enable_start_s') 
+18:39:48,554:  performGetValue('enable_start_s') returned 0.00s
+18:39:48,554:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver finished in 0 ms, # of ops in queue: 1
+18:39:48,555:  ad_low_noise_float_2023 - : Get value: enable_s: Driver started
+18:39:48,555:  performGetValue('enable_s') 
+18:39:48,555:  performGetValue('enable_s') returned 0.00s
+18:39:48,555:  ad_low_noise_float_2023 - : Get value: enable_s: Driver finished in 0 ms, # of ops in queue: 0
+18:39:48,638:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 3 idx: Operation added, # of ops in queue: 1
+18:39:48,638:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 3 idx: Driver started
+18:39:48,639:  performSetValue('Scenario', 3.0)
+18:39:48,639:  run_scenario(scenario=3, run_synchron=False, do_validate=False): scenario_03_prepare_disable.py
+18:39:48,639:  micropython execfile: scenario_03_prepare_disable.py
+18:39:48,644:  micropython execfile: scenario_03_prepare_disable.py returned b''
+18:39:48,648:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:39:48,652:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:39:48,652:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:39:48,657:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:39:48,657:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 3 idx: Driver finished in 18 ms, # of ops in queue: 0
+18:39:48,670:  ad_low_noise_float_2023 - : Get value: IN_disable: Operation added, # of ops in queue: 1
+18:39:48,670:  ad_low_noise_float_2023 - : Get value: IN_t: Operation added, # of ops in queue: 2
+18:39:48,670:  ad_low_noise_float_2023 - : Get value: IN_voltage: Operation added, # of ops in queue: 3
+18:39:48,670:  ad_low_noise_float_2023 - : Get value: Input range: Operation added, # of ops in queue: 4
+18:39:48,672:  ad_low_noise_float_2023 - : Get value: timeout_detected: Operation added, # of ops in queue: 5
+18:39:48,672:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Operation added, # of ops in queue: 6
+18:39:48,672:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Operation added, # of ops in queue: 7
+18:39:48,672:  ad_low_noise_float_2023 - : Get value: enable_start_s: Operation added, # of ops in queue: 8
+18:39:48,672:  ad_low_noise_float_2023 - : Get value: enable_s: Operation added, # of ops in queue: 9
+18:39:48,672:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver started
+18:39:48,672:  performGetValue('IN_disable') FIRST
+18:39:49,556:  CAPTURING append(0) idx0_start_capturing=83253 of 30000
+18:39:49,556:  CAPTURING append(30000)
+18:39:49,557:  CAPTURING append(30000)
+18:39:49,557:  CAPTURING append(30000)
+18:39:50,562:  CAPTURING append(30000)
+18:39:50,563:  CAPTURING append(30000)
+18:39:50,564:  CAPTURING append(30000)
+18:39:51,568:  CAPTURING append(30000)
+18:39:51,568:  CAPTURING append(30000)
+18:39:51,571:  CAPTURING append(30000)
+18:39:52,577:  CAPTURING append(30000)
+18:39:52,578:  CAPTURING append(30000)
+18:39:52,579:  CAPTURING append(30000)
+18:39:52,580:  CAPTURING append(30000)
+18:39:53,582:  CAPTURING append(30000)
+18:39:53,584:  CAPTURING append(30000)
+18:39:53,586:  CAPTURING append(30000)
+18:39:54,590:  CAPTURING append(30000)
+18:39:54,592:  TIMEOUT 510000(488280)samples 5.000s 97656SPS
+18:39:54,592:      510000samples
+18:39:54,592:      97656SPS
+18:39:54,592:      timeout_detected=True
+18:39:54,592:      enable_start_detected=False enable_start_s=0.000s
+18:39:54,593:      enable_end_detected=False enable_s=0.000s
+18:39:54,593:  performGetValue('IN_disable') returned 5.92s
+18:39:54,593:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver finished in 5921 ms, # of ops in queue: 8
+18:39:54,594:  ad_low_noise_float_2023 - : Get value: IN_t: Driver started
+18:39:54,594:  performGetValue('IN_t') 
+18:39:54,594:  performGetValue('IN_t') returned 0.00s
+18:39:54,594:  ad_low_noise_float_2023 - : Get value: IN_t: Driver finished in 1 ms, # of ops in queue: 7
+18:39:54,595:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver started
+18:39:54,595:  performGetValue('IN_voltage') 
+18:39:54,595:  performGetValue('IN_voltage') returned 0.00s
+18:39:54,596:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver finished in 0 ms, # of ops in queue: 6
+18:39:54,597:  ad_low_noise_float_2023 - : Get value: Input range: Driver started
+18:39:54,598:  performGetValue('Input range') 
+18:39:54,598:  performGetValue('Input range') returned 0.00s
+18:39:54,598:  ad_low_noise_float_2023 - : Get value: Input range: Driver finished in 0 ms, # of ops in queue: 5
+18:39:54,598:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver started
+18:39:54,598:  performGetValue('timeout_detected') 
+18:39:54,598:  performGetValue('timeout_detected') returned 0.00s
+18:39:54,599:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver finished in 1 ms, # of ops in queue: 4
+18:39:54,599:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver started
+18:39:54,599:  performGetValue('enable_start_detected') 
+18:39:54,599:  performGetValue('enable_start_detected') returned 0.00s
+18:39:54,599:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver finished in 0 ms, # of ops in queue: 3
+18:39:54,599:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver started
+18:39:54,600:  performGetValue('enable_end_detected') 
+18:39:54,600:  performGetValue('enable_end_detected') returned 0.00s
+18:39:54,600:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver finished in 0 ms, # of ops in queue: 2
+18:39:54,600:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver started
+18:39:54,600:  performGetValue('enable_start_s') 
+18:39:54,600:  performGetValue('enable_start_s') returned 0.00s
+18:39:54,600:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver finished in 0 ms, # of ops in queue: 1
+18:39:54,600:  ad_low_noise_float_2023 - : Get value: enable_s: Driver started
+18:39:54,600:  performGetValue('enable_s') 
+18:39:54,600:  performGetValue('enable_s') returned 0.00s
+18:39:54,600:  ad_low_noise_float_2023 - : Get value: enable_s: Driver finished in 0 ms, # of ops in queue: 0
+18:39:54,733:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 4 idx: Operation added, # of ops in queue: 1
+18:39:54,733:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 4 idx: Driver started
+18:39:54,733:  performSetValue('Scenario', 4.0)
+18:39:54,734:  run_scenario(scenario=4, run_synchron=False, do_validate=False): scenario_04_test_enable_disable.py
+18:39:54,734:  micropython execfile: scenario_04_test_enable_disable.py
+18:39:54,749:  micropython execfile: scenario_04_test_enable_disable.py returned b''
+18:39:54,752:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:39:54,757:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:39:54,757:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:39:54,762:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:39:54,762:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 4 idx: Driver finished in 28 ms, # of ops in queue: 0
+18:39:54,778:  ad_low_noise_float_2023 - : Get value: IN_disable: Operation added, # of ops in queue: 1
+18:39:54,778:  ad_low_noise_float_2023 - : Get value: IN_t: Operation added, # of ops in queue: 2
+18:39:54,778:  ad_low_noise_float_2023 - : Get value: IN_voltage: Operation added, # of ops in queue: 3
+18:39:54,778:  ad_low_noise_float_2023 - : Get value: Input range: Operation added, # of ops in queue: 4
+18:39:54,778:  ad_low_noise_float_2023 - : Get value: timeout_detected: Operation added, # of ops in queue: 5
+18:39:54,778:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Operation added, # of ops in queue: 6
+18:39:54,778:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Operation added, # of ops in queue: 7
+18:39:54,778:  ad_low_noise_float_2023 - : Get value: enable_start_s: Operation added, # of ops in queue: 8
+18:39:54,779:  ad_low_noise_float_2023 - : Get value: enable_s: Operation added, # of ops in queue: 9
+18:39:54,779:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver started
+18:39:54,779:  performGetValue('IN_disable') FIRST
+18:39:55,598:  CAPTURING append(0) idx0_start_capturing=54168 of 30000
+18:39:55,598:  CAPTURING append(14780)
+18:39:55,599:  CAPTURING append(19614)
+18:39:55,599:  enable_start_detected: idx0=14814 self._sps=97656 self.enable_start_s=0.152s
+18:39:55,599:  CAPTURING append(9764)
+18:39:55,600:  CAPTURING append(19540)
+18:39:56,605:  CAPTURING append(30000)
+18:39:56,606:  enable_end_detected: idx0=48919 self._sps=97656 self.enable_s=0.501s
+18:39:56,606:      48920samples
+18:39:56,606:      97656SPS
+18:39:56,607:      timeout_detected=False
+18:39:56,607:      enable_start_detected=True enable_start_s=0.152s
+18:39:56,607:      enable_end_detected=True enable_s=0.501s
+18:39:56,607:  performGetValue('IN_disable') returned 1.83s
+18:39:56,609:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver finished in 1829 ms, # of ops in queue: 8
+18:39:56,609:  ad_low_noise_float_2023 - : Get value: IN_t: Driver started
+18:39:56,609:  performGetValue('IN_t') 
+18:39:56,609:  performGetValue('IN_t') returned 0.00s
+18:39:56,609:  ad_low_noise_float_2023 - : Get value: IN_t: Driver finished in 1 ms, # of ops in queue: 7
+18:39:56,610:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver started
+18:39:56,610:  performGetValue('IN_voltage') 
+18:39:56,610:  performGetValue('IN_voltage') returned 0.00s
+18:39:56,610:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver finished in 0 ms, # of ops in queue: 6
+18:39:56,610:  ad_low_noise_float_2023 - : Get value: Input range: Driver started
+18:39:56,611:  performGetValue('Input range') 
+18:39:56,611:  performGetValue('Input range') returned 0.00s
+18:39:56,611:  ad_low_noise_float_2023 - : Get value: Input range: Driver finished in 0 ms, # of ops in queue: 5
+18:39:56,611:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver started
+18:39:56,611:  performGetValue('timeout_detected') 
+18:39:56,611:  performGetValue('timeout_detected') returned 0.00s
+18:39:56,611:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver finished in 0 ms, # of ops in queue: 4
+18:39:56,611:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver started
+18:39:56,611:  performGetValue('enable_start_detected') 
+18:39:56,611:  performGetValue('enable_start_detected') returned 0.00s
+18:39:56,611:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver finished in 0 ms, # of ops in queue: 3
+18:39:56,611:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver started
+18:39:56,612:  performGetValue('enable_end_detected') 
+18:39:56,612:  performGetValue('enable_end_detected') returned 0.00s
+18:39:56,612:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver finished in 0 ms, # of ops in queue: 2
+18:39:56,612:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver started
+18:39:56,612:  performGetValue('enable_start_s') 
+18:39:56,612:  performGetValue('enable_start_s') returned 0.00s
+18:39:56,612:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver finished in 0 ms, # of ops in queue: 1
+18:39:56,612:  ad_low_noise_float_2023 - : Get value: enable_s: Driver started
+18:39:56,612:  performGetValue('enable_s') 
+18:39:56,613:  performGetValue('enable_s') returned 0.00s
+18:39:56,613:  ad_low_noise_float_2023 - : Get value: enable_s: Driver finished in 0 ms, # of ops in queue: 0
+18:39:56,678:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 5 idx: Operation added, # of ops in queue: 1
+18:39:56,679:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 5 idx: Driver started
+18:39:56,679:  performSetValue('Scenario', 5.0)
+18:39:56,679:  run_scenario(scenario=5, run_synchron=False, do_validate=False): scenario_05_test_enable_disable.py
+18:39:56,679:  micropython execfile: scenario_05_test_enable_disable.py
+18:39:56,696:  micropython execfile: scenario_05_test_enable_disable.py returned b''
+18:39:56,700:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:39:56,705:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:39:56,705:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:39:56,710:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:39:56,710:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 5 idx: Driver finished in 31 ms, # of ops in queue: 0
+18:39:56,725:  ad_low_noise_float_2023 - : Get value: IN_disable: Operation added, # of ops in queue: 1
+18:39:56,725:  ad_low_noise_float_2023 - : Get value: IN_t: Operation added, # of ops in queue: 2
+18:39:56,725:  ad_low_noise_float_2023 - : Get value: IN_voltage: Operation added, # of ops in queue: 3
+18:39:56,726:  ad_low_noise_float_2023 - : Get value: Input range: Operation added, # of ops in queue: 4
+18:39:56,726:  ad_low_noise_float_2023 - : Get value: timeout_detected: Operation added, # of ops in queue: 5
+18:39:56,726:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Operation added, # of ops in queue: 6
+18:39:56,726:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Operation added, # of ops in queue: 7
+18:39:56,726:  ad_low_noise_float_2023 - : Get value: enable_start_s: Operation added, # of ops in queue: 8
+18:39:56,726:  ad_low_noise_float_2023 - : Get value: enable_s: Operation added, # of ops in queue: 9
+18:39:56,726:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver started
+18:39:56,727:  performGetValue('IN_disable') FIRST
+18:39:57,612:  CAPTURING append(26301) idx0_start_capturing=3699 of 30000
+18:39:57,613:  CAPTURING append(30000)
+18:39:57,614:  CAPTURING append(30000)
+18:39:58,619:  CAPTURING append(30000)
+18:39:58,619:  CAPTURING append(30000)
+18:39:58,620:  CAPTURING append(30000)
+18:39:59,629:  CAPTURING append(30000)
+18:39:59,629:  CAPTURING append(30000)
+18:39:59,630:  CAPTURING append(30000)
+18:40:00,636:  CAPTURING append(30000)
+18:40:00,638:  CAPTURING append(4547)
+18:40:00,638:  CAPTURING append(19582)
+18:40:00,639:  enable_start_detected: idx0=300881 self._sps=97656 self.enable_start_s=3.081s
+18:40:00,639:  CAPTURING append(9765)
+18:40:00,640:  CAPTURING append(19538)
+18:40:00,640:  CAPTURING append(30000)
+18:40:00,640:  enable_end_detected: idx0=48887 self._sps=97656 self.enable_s=0.501s
+18:40:00,640:      48888samples
+18:40:00,642:      97656SPS
+18:40:00,642:      timeout_detected=False
+18:40:00,642:      enable_start_detected=True enable_start_s=3.081s
+18:40:00,642:      enable_end_detected=True enable_s=0.501s
+18:40:00,642:  performGetValue('IN_disable') returned 3.91s
+18:40:00,643:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver finished in 3916 ms, # of ops in queue: 8
+18:40:00,643:  ad_low_noise_float_2023 - : Get value: IN_t: Driver started
+18:40:00,643:  performGetValue('IN_t') 
+18:40:00,643:  performGetValue('IN_t') returned 0.00s
+18:40:00,643:  ad_low_noise_float_2023 - : Get value: IN_t: Driver finished in 1 ms, # of ops in queue: 7
+18:40:00,644:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver started
+18:40:00,644:  performGetValue('IN_voltage') 
+18:40:00,644:  performGetValue('IN_voltage') returned 0.00s
+18:40:00,644:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver finished in 0 ms, # of ops in queue: 6
+18:40:00,644:  ad_low_noise_float_2023 - : Get value: Input range: Driver started
+18:40:00,644:  performGetValue('Input range') 
+18:40:00,644:  performGetValue('Input range') returned 0.00s
+18:40:00,644:  ad_low_noise_float_2023 - : Get value: Input range: Driver finished in 0 ms, # of ops in queue: 5
+18:40:00,645:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver started
+18:40:00,645:  performGetValue('timeout_detected') 
+18:40:00,645:  performGetValue('timeout_detected') returned 0.00s
+18:40:00,645:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver finished in 0 ms, # of ops in queue: 4
+18:40:00,645:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver started
+18:40:00,645:  performGetValue('enable_start_detected') 
+18:40:00,645:  performGetValue('enable_start_detected') returned 0.00s
+18:40:00,646:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver finished in 0 ms, # of ops in queue: 3
+18:40:00,646:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver started
+18:40:00,646:  performGetValue('enable_end_detected') 
+18:40:00,646:  performGetValue('enable_end_detected') returned 0.00s
+18:40:00,646:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver finished in 0 ms, # of ops in queue: 2
+18:40:00,646:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver started
+18:40:00,646:  performGetValue('enable_start_s') 
+18:40:00,647:  performGetValue('enable_start_s') returned 0.00s
+18:40:00,647:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver finished in 0 ms, # of ops in queue: 1
+18:40:00,647:  ad_low_noise_float_2023 - : Get value: enable_s: Driver started
+18:40:00,647:  performGetValue('enable_s') 
+18:40:00,647:  performGetValue('enable_s') returned 0.00s
+18:40:00,647:  ad_low_noise_float_2023 - : Get value: enable_s: Driver finished in 0 ms, # of ops in queue: 0
+18:40:00,709:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 6 idx: Operation added, # of ops in queue: 1
+18:40:00,710:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 6 idx: Driver started
+18:40:00,710:  performSetValue('Scenario', 6.0)
+18:40:00,710:  run_scenario(scenario=6, run_synchron=False, do_validate=False): scenario_06_test_delay_trigger_vs_signal.py
+18:40:00,710:  micropython execfile: scenario_06_test_delay_trigger_vs_signal.py
+18:40:00,722:  micropython execfile: scenario_06_test_delay_trigger_vs_signal.py returned b''
+18:40:00,725:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:40:00,729:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:40:00,730:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:40:00,734:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:40:00,734:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 6 idx: Driver finished in 25 ms, # of ops in queue: 0
+18:40:00,749:  ad_low_noise_float_2023 - : Get value: IN_disable: Operation added, # of ops in queue: 1
+18:40:00,749:  ad_low_noise_float_2023 - : Get value: IN_t: Operation added, # of ops in queue: 2
+18:40:00,749:  ad_low_noise_float_2023 - : Get value: IN_voltage: Operation added, # of ops in queue: 3
+18:40:00,749:  ad_low_noise_float_2023 - : Get value: Input range: Operation added, # of ops in queue: 4
+18:40:00,749:  ad_low_noise_float_2023 - : Get value: timeout_detected: Operation added, # of ops in queue: 5
+18:40:00,749:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Operation added, # of ops in queue: 6
+18:40:00,749:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Operation added, # of ops in queue: 7
+18:40:00,750:  ad_low_noise_float_2023 - : Get value: enable_start_s: Operation added, # of ops in queue: 8
+18:40:00,750:  ad_low_noise_float_2023 - : Get value: enable_s: Operation added, # of ops in queue: 9
+18:40:00,750:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver started
+18:40:00,750:  performGetValue('IN_disable') FIRST
+18:40:01,644:  CAPTURING append(0) idx0_start_capturing=34140 of 30000
+18:40:01,645:  CAPTURING append(20374)
+18:40:01,645:  CAPTURING append(1000)
+18:40:01,645:  enable_start_detected: idx0=20407 self._sps=97656 self.enable_start_s=0.209s
+18:40:01,646:  CAPTURING append(30000)
+18:40:01,646:  enable_end_detected: idx0=391 self._sps=97656 self.enable_s=0.004s
+18:40:01,646:      392samples
+18:40:01,647:      97656SPS
+18:40:01,647:      timeout_detected=False
+18:40:01,647:      enable_start_detected=True enable_start_s=0.209s
+18:40:01,647:      enable_end_detected=True enable_s=0.004s
+18:40:01,647:  performGetValue('IN_disable') returned 0.91s
+18:40:01,647:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver finished in 898 ms, # of ops in queue: 8
+18:40:01,649:  ad_low_noise_float_2023 - : Get value: IN_t: Driver started
+18:40:01,649:  performGetValue('IN_t') 
+18:40:01,649:  performGetValue('IN_t') returned 0.00s
+18:40:01,649:  ad_low_noise_float_2023 - : Get value: IN_t: Driver finished in 0 ms, # of ops in queue: 7
+18:40:01,649:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver started
+18:40:01,650:  performGetValue('IN_voltage') 
+18:40:01,650:  performGetValue('IN_voltage') returned 0.00s
+18:40:01,650:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver finished in 0 ms, # of ops in queue: 6
+18:40:01,650:  ad_low_noise_float_2023 - : Get value: Input range: Driver started
+18:40:01,650:  performGetValue('Input range') 
+18:40:01,650:  performGetValue('Input range') returned 0.00s
+18:40:01,651:  ad_low_noise_float_2023 - : Get value: Input range: Driver finished in 0 ms, # of ops in queue: 5
+18:40:01,651:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver started
+18:40:01,651:  performGetValue('timeout_detected') 
+18:40:01,651:  performGetValue('timeout_detected') returned 0.00s
+18:40:01,651:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver finished in 0 ms, # of ops in queue: 4
+18:40:01,651:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver started
+18:40:01,651:  performGetValue('enable_start_detected') 
+18:40:01,651:  performGetValue('enable_start_detected') returned 0.00s
+18:40:01,651:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver finished in 0 ms, # of ops in queue: 3
+18:40:01,651:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver started
+18:40:01,651:  performGetValue('enable_end_detected') 
+18:40:01,651:  performGetValue('enable_end_detected') returned 0.00s
+18:40:01,651:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver finished in 0 ms, # of ops in queue: 2
+18:40:01,652:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver started
+18:40:01,652:  performGetValue('enable_start_s') 
+18:40:01,652:  performGetValue('enable_start_s') returned 0.00s
+18:40:01,652:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver finished in 0 ms, # of ops in queue: 1
+18:40:01,652:  ad_low_noise_float_2023 - : Get value: enable_s: Driver started
+18:40:01,652:  performGetValue('enable_s') 
+18:40:01,652:  performGetValue('enable_s') returned 0.00s
+18:40:01,652:  ad_low_noise_float_2023 - : Get value: enable_s: Driver finished in 0 ms, # of ops in queue: 0
+18:40:01,707:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Operation added, # of ops in queue: 1
+18:40:01,707:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Driver started
+18:40:01,707:  performSetValue('Scenario', 0.0)
+18:40:01,707:  run_scenario(scenario=0, run_synchron=False, do_validate=False): scenario_00_prepare_enable.py
+18:40:01,707:  micropython execfile: scenario_00_prepare_enable.py
+18:40:01,712:  micropython execfile: scenario_00_prepare_enable.py returned b''
+18:40:01,716:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:40:01,720:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:40:01,720:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:40:01,724:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:40:01,725:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Driver finished in 17 ms, # of ops in queue: 0
+18:41:30,942:  ad_low_noise_float_2023 - : Get value: sample_rate_SPS: Operation added, # of ops in queue: 1
+18:41:30,943:  ad_low_noise_float_2023 - : Get value: sample_rate_SPS: Driver started
+18:41:30,943:  performGetValue('sample_rate_SPS') FIRST
+18:41:31,566:  CAPTURING append(16287) idx0_start_capturing=13713 of 30000
+18:41:31,567:  enable_start_detected: idx0=0 self._sps=97656 self.enable_start_s=0.000s
+18:41:31,567:  CAPTURING append(30000)
+18:41:31,568:  CAPTURING append(30000)
+18:41:32,582:  CAPTURING append(30000)
+18:41:32,582:  CAPTURING append(30000)
+18:41:32,583:  CAPTURING append(30000)
+18:41:33,591:  CAPTURING append(30000)
+18:41:33,591:  CAPTURING append(30000)
+18:41:33,592:  CAPTURING append(30000)
+18:41:33,593:  CAPTURING append(30000)
+18:41:34,598:  CAPTURING append(30000)
+18:41:34,599:  CAPTURING append(30000)
+18:41:34,600:  CAPTURING append(30000)
+18:41:35,608:  CAPTURING append(30000)
+18:41:35,610:  CAPTURING append(30000)
+18:41:35,611:  CAPTURING append(30000)
+18:41:36,617:  CAPTURING append(30000)
+18:41:36,619:  CAPTURING append(30000)
+18:41:36,620:  TIMEOUT 510001(488280)samples 5.000s 97656SPS
+18:41:36,620:      510001samples
+18:41:36,620:      97656SPS
+18:41:36,620:      timeout_detected=True
+18:41:36,620:      enable_start_detected=True enable_start_s=0.000s
+18:41:36,622:      enable_end_detected=False enable_s=0.000s
+18:41:36,622:  performGetValue('sample_rate_SPS') returned 5.67s
+18:41:36,622:  ad_low_noise_float_2023 - : Get value: sample_rate_SPS: Driver finished in 5679 ms, # of ops in queue: 0
+18:41:36,623:  ad_low_noise_float_2023 - : Set value: sample_rate_SPS = SPS_03052: Operation added, # of ops in queue: 1
+18:41:36,623:  ad_low_noise_float_2023 - : Set value: sample_rate_SPS = SPS_03052: Driver started
+18:41:36,623:  SPS changed from SPS_97656 to SPS_03052: Requires reconnect to the AD pico.
+18:41:36,623:  performSetValue('sample_rate_SPS', SPS_97656 -> SPS_03052) FIRST 0.00s
+18:41:36,623:  ad_low_noise_float_2023 - : Set value: sample_rate_SPS = SPS_03052: Driver finished in 0 ms, # of ops in queue: 0
+18:41:36,629:  ad_low_noise_float_2023 - : Get value: sample_rate_SPS: Operation added, # of ops in queue: 1
+18:41:36,630:  ad_low_noise_float_2023 - : Get value: sample_rate_SPS: Driver started
+18:41:36,630:  performGetValue('sample_rate_SPS') FIRST
+18:41:37,624:  connect(): Start reconnect to update SPS.
+18:41:38,721:  connect(): Done reconnect to update SPS.
+18:41:39,737:  CAPTURING append(0) idx0_start_capturing=80142 of 1000
+18:41:49,839:  CAPTURING append(30000)
+18:41:49,839:  enable_start_detected: idx0=0 self._sps=3052 self.enable_start_s=0.000s
+18:41:58,923:  CAPTURING append(30000)
+18:41:58,923:  TIMEOUT 30001(15260)samples 5.000s 3052SPS
+18:41:58,923:      30001samples
+18:41:58,924:      3052SPS
+18:41:58,924:      timeout_detected=True
+18:41:58,924:      enable_start_detected=True enable_start_s=0.000s
+18:41:58,924:      enable_end_detected=False enable_s=0.000s
+18:41:58,924:  performGetValue('sample_rate_SPS') returned 22.28s
+18:41:58,925:  ad_low_noise_float_2023 - : Get value: sample_rate_SPS: Driver finished in 22295 ms, # of ops in queue: 0
+18:41:58,925:  ad_low_noise_float_2023 - : Get value: sample_rate_SPS: Operation added, # of ops in queue: 1
+18:41:58,925:  ad_low_noise_float_2023 - : Get value: sample_rate_SPS: Driver started
+18:41:58,926:  performGetValue('sample_rate_SPS') FIRST
+18:42:09,029:  CAPTURING append(28068) idx0_start_capturing=1932 of 30000
+18:42:09,029:  enable_start_detected: idx0=0 self._sps=3052 self.enable_start_s=0.000s
+18:42:19,125:  CAPTURING append(30000)
+18:42:19,125:  TIMEOUT 30001(15260)samples 5.000s 3052SPS
+18:42:19,125:      30001samples
+18:42:19,127:      3052SPS
+18:42:19,127:      timeout_detected=True
+18:42:19,127:      enable_start_detected=True enable_start_s=0.000s
+18:42:19,127:      enable_end_detected=False enable_s=0.000s
+18:42:19,127:  performGetValue('sample_rate_SPS') returned 20.20s
+18:42:19,127:  ad_low_noise_float_2023 - : Get value: sample_rate_SPS: Driver finished in 20202 ms, # of ops in queue: 0
+18:42:20,638:  ad_low_noise_float_2023_stimuli - : Set config: Operation added, # of ops in queue: 1
+18:42:20,638:  ad_low_noise_float_2023_stimuli - : Set config: Driver started
+18:42:20,639:  performSetValue('Logging', DEBUG)
+18:42:20,639:  ad_low_noise_float_2023 - : Set config: Operation added, # of ops in queue: 1
+18:42:20,639:  Logging severity not implemented yet
+18:42:20,639:  ad_low_noise_float_2023 - : Set config: Driver started
+18:42:20,640:  performSetValue('Synchron', ASYNCHRON)
+18:42:20,640:  performSetValue('Scenario', 0.0)
+18:42:20,640:  performSetValue('Logging Driver', DEBUG -> DEBUG) FIRST 0.00s
+18:42:20,640:  performSetValue('Logging AD', DEBUG -> DEBUG)  0.00s
+18:42:20,640:  run_scenario(scenario=0, run_synchron=False, do_validate=False): scenario_00_prepare_enable.py
+18:42:20,640:  performSetValue('duration_max_s', 5.0 -> 5.0)  0.00s
+18:42:20,640:  micropython execfile: scenario_00_prepare_enable.py
+18:42:20,641:  performSetValue('sample_rate_SPS', SPS_03052 -> SPS_03052)  0.00s
+18:42:20,641:  ad_low_noise_float_2023 - : Set config: Driver finished in 1 ms, # of ops in queue: 0
+18:42:20,645:  micropython execfile: scenario_00_prepare_enable.py returned b''
+18:42:20,648:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:42:20,652:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:42:20,653:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:42:20,657:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:42:20,657:  ad_low_noise_float_2023_stimuli - : Set config: Driver finished in 18 ms, # of ops in queue: 0
+18:42:20,704:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Operation added, # of ops in queue: 1
+18:42:20,704:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Driver started
+18:42:20,705:  performSetValue('Scenario', 0.0)
+18:42:20,705:  run_scenario(scenario=0, run_synchron=False, do_validate=False): scenario_00_prepare_enable.py
+18:42:20,705:  micropython execfile: scenario_00_prepare_enable.py
+18:42:20,710:  micropython execfile: scenario_00_prepare_enable.py returned b''
+18:42:20,713:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:42:20,717:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:42:20,717:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:42:20,720:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:42:20,722:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Driver finished in 17 ms, # of ops in queue: 0
+18:42:20,735:  ad_low_noise_float_2023 - : Get value: IN_disable: Operation added, # of ops in queue: 1
+18:42:20,735:  ad_low_noise_float_2023 - : Get value: IN_t: Operation added, # of ops in queue: 2
+18:42:20,736:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver started
+18:42:20,736:  ad_low_noise_float_2023 - : Get value: IN_voltage: Operation added, # of ops in queue: 2
+18:42:20,736:  ad_low_noise_float_2023 - : Get value: Input range: Operation added, # of ops in queue: 3
+18:42:20,736:  ad_low_noise_float_2023 - : Get value: timeout_detected: Operation added, # of ops in queue: 4
+18:42:20,736:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Operation added, # of ops in queue: 5
+18:42:20,736:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Operation added, # of ops in queue: 6
+18:42:20,736:  ad_low_noise_float_2023 - : Get value: enable_start_s: Operation added, # of ops in queue: 7
+18:42:20,737:  ad_low_noise_float_2023 - : Get value: enable_s: Operation added, # of ops in queue: 8
+18:42:20,737:  performGetValue('IN_disable') FIRST
+18:42:28,210:  CAPTURING append(13815) idx0_start_capturing=16185 of 30000
+18:42:28,210:  enable_start_detected: idx0=0 self._sps=3052 self.enable_start_s=0.000s
+18:42:38,306:  CAPTURING append(30000)
+18:42:38,306:  TIMEOUT 30001(15260)samples 5.000s 3052SPS
+18:42:38,306:      30001samples
+18:42:38,306:      3052SPS
+18:42:38,307:      timeout_detected=True
+18:42:38,307:      enable_start_detected=True enable_start_s=0.000s
+18:42:38,307:      enable_end_detected=False enable_s=0.000s
+18:42:38,307:  performGetValue('IN_disable') returned 17.58s
+18:42:38,307:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver finished in 17572 ms, # of ops in queue: 8
+18:42:38,307:  ad_low_noise_float_2023 - : Get value: IN_t: Driver started
+18:42:38,308:  performGetValue('IN_t') 
+18:42:38,308:  performGetValue('IN_t') returned 0.00s
+18:42:38,308:  ad_low_noise_float_2023 - : Get value: IN_t: Driver finished in 1 ms, # of ops in queue: 7
+18:42:38,308:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver started
+18:42:38,308:  performGetValue('IN_voltage') 
+18:42:38,309:  performGetValue('IN_voltage') returned 0.00s
+18:42:38,309:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver finished in 0 ms, # of ops in queue: 6
+18:42:38,309:  ad_low_noise_float_2023 - : Get value: Input range: Driver started
+18:42:38,309:  performGetValue('Input range') 
+18:42:38,309:  performGetValue('Input range') returned 0.00s
+18:42:38,309:  ad_low_noise_float_2023 - : Get value: Input range: Driver finished in 0 ms, # of ops in queue: 5
+18:42:38,309:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver started
+18:42:38,309:  performGetValue('timeout_detected') 
+18:42:38,310:  performGetValue('timeout_detected') returned 0.00s
+18:42:38,310:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver finished in 0 ms, # of ops in queue: 4
+18:42:38,310:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver started
+18:42:38,310:  performGetValue('enable_start_detected') 
+18:42:38,310:  performGetValue('enable_start_detected') returned 0.00s
+18:42:38,310:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver finished in 0 ms, # of ops in queue: 3
+18:42:38,310:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver started
+18:42:38,311:  performGetValue('enable_end_detected') 
+18:42:38,311:  performGetValue('enable_end_detected') returned 0.00s
+18:42:38,311:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver finished in 0 ms, # of ops in queue: 2
+18:42:38,311:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver started
+18:42:38,311:  performGetValue('enable_start_s') 
+18:42:38,311:  performGetValue('enable_start_s') returned 0.00s
+18:42:38,311:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver finished in 0 ms, # of ops in queue: 1
+18:42:38,311:  ad_low_noise_float_2023 - : Get value: enable_s: Driver started
+18:42:38,311:  performGetValue('enable_s') 
+18:42:38,311:  performGetValue('enable_s') returned 0.00s
+18:42:38,312:  ad_low_noise_float_2023 - : Get value: enable_s: Driver finished in 0 ms, # of ops in queue: 0
+18:42:38,323:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 1 idx: Operation added, # of ops in queue: 1
+18:42:38,323:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 1 idx: Driver started
+18:42:38,323:  performSetValue('Scenario', 1.0)
+18:42:38,323:  run_scenario(scenario=1, run_synchron=False, do_validate=False): scenario_01_test_timeout.py
+18:42:38,324:  micropython execfile: scenario_01_test_timeout.py
+18:42:38,327:  micropython execfile: scenario_01_test_timeout.py returned b''
+18:42:38,330:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:42:38,335:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:42:38,335:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:42:38,340:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:42:38,340:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 1 idx: Driver finished in 17 ms, # of ops in queue: 0
+18:42:38,355:  ad_low_noise_float_2023 - : Get value: IN_disable: Operation added, # of ops in queue: 1
+18:42:38,355:  ad_low_noise_float_2023 - : Get value: IN_t: Operation added, # of ops in queue: 2
+18:42:38,356:  ad_low_noise_float_2023 - : Get value: IN_voltage: Operation added, # of ops in queue: 3
+18:42:38,356:  ad_low_noise_float_2023 - : Get value: Input range: Operation added, # of ops in queue: 4
+18:42:38,356:  ad_low_noise_float_2023 - : Get value: timeout_detected: Operation added, # of ops in queue: 5
+18:42:38,356:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Operation added, # of ops in queue: 6
+18:42:38,356:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Operation added, # of ops in queue: 7
+18:42:38,356:  ad_low_noise_float_2023 - : Get value: enable_start_s: Operation added, # of ops in queue: 8
+18:42:38,356:  ad_low_noise_float_2023 - : Get value: enable_s: Operation added, # of ops in queue: 9
+18:42:38,356:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver started
+18:42:38,356:  performGetValue('IN_disable') FIRST
+18:42:48,400:  CAPTURING append(27564) idx0_start_capturing=2436 of 30000
+18:42:48,400:  enable_start_detected: idx0=0 self._sps=3052 self.enable_start_s=0.000s
+18:42:58,498:  CAPTURING append(30000)
+18:42:58,498:  TIMEOUT 30001(15260)samples 5.000s 3052SPS
+18:42:58,498:      30001samples
+18:42:58,499:      3052SPS
+18:42:58,499:      timeout_detected=True
+18:42:58,499:      enable_start_detected=True enable_start_s=0.000s
+18:42:58,499:      enable_end_detected=False enable_s=0.000s
+18:42:58,499:  performGetValue('IN_disable') returned 20.14s
+18:42:58,499:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver finished in 20144 ms, # of ops in queue: 8
+18:42:58,499:  ad_low_noise_float_2023 - : Get value: IN_t: Driver started
+18:42:58,500:  performGetValue('IN_t') 
+18:42:58,500:  performGetValue('IN_t') returned 0.00s
+18:42:58,500:  ad_low_noise_float_2023 - : Get value: IN_t: Driver finished in 0 ms, # of ops in queue: 7
+18:42:58,500:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver started
+18:42:58,500:  performGetValue('IN_voltage') 
+18:42:58,501:  performGetValue('IN_voltage') returned 0.00s
+18:42:58,501:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver finished in 0 ms, # of ops in queue: 6
+18:42:58,501:  ad_low_noise_float_2023 - : Get value: Input range: Driver started
+18:42:58,501:  performGetValue('Input range') 
+18:42:58,501:  performGetValue('Input range') returned 0.00s
+18:42:58,501:  ad_low_noise_float_2023 - : Get value: Input range: Driver finished in 0 ms, # of ops in queue: 5
+18:42:58,501:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver started
+18:42:58,502:  performGetValue('timeout_detected') 
+18:42:58,502:  performGetValue('timeout_detected') returned 0.00s
+18:42:58,502:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver finished in 0 ms, # of ops in queue: 4
+18:42:58,502:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver started
+18:42:58,502:  performGetValue('enable_start_detected') 
+18:42:58,502:  performGetValue('enable_start_detected') returned 0.00s
+18:42:58,502:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver finished in 0 ms, # of ops in queue: 3
+18:42:58,502:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver started
+18:42:58,504:  performGetValue('enable_end_detected') 
+18:42:58,504:  performGetValue('enable_end_detected') returned 0.00s
+18:42:58,504:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver finished in 0 ms, # of ops in queue: 2
+18:42:58,504:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver started
+18:42:58,504:  performGetValue('enable_start_s') 
+18:42:58,504:  performGetValue('enable_start_s') returned 0.00s
+18:42:58,504:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver finished in 0 ms, # of ops in queue: 1
+18:42:58,504:  ad_low_noise_float_2023 - : Get value: enable_s: Driver started
+18:42:58,504:  performGetValue('enable_s') 
+18:42:58,504:  performGetValue('enable_s') returned 0.00s
+18:42:58,504:  ad_low_noise_float_2023 - : Get value: enable_s: Driver finished in 0 ms, # of ops in queue: 0
+18:42:58,510:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 2 idx: Operation added, # of ops in queue: 1
+18:42:58,511:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 2 idx: Driver started
+18:42:58,511:  performSetValue('Scenario', 2.0)
+18:42:58,511:  run_scenario(scenario=2, run_synchron=False, do_validate=False): scenario_02_test_enable_end_detected.py
+18:42:58,511:  micropython execfile: scenario_02_test_enable_end_detected.py
+18:42:58,516:  micropython execfile: scenario_02_test_enable_end_detected.py returned b''
+18:42:58,519:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:42:58,524:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:42:58,524:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:42:58,528:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:42:58,528:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 2 idx: Driver finished in 18 ms, # of ops in queue: 0
+18:42:58,543:  ad_low_noise_float_2023 - : Get value: IN_disable: Operation added, # of ops in queue: 1
+18:42:58,544:  ad_low_noise_float_2023 - : Get value: IN_t: Operation added, # of ops in queue: 2
+18:42:58,544:  ad_low_noise_float_2023 - : Get value: IN_voltage: Operation added, # of ops in queue: 3
+18:42:58,544:  ad_low_noise_float_2023 - : Get value: Input range: Operation added, # of ops in queue: 4
+18:42:58,544:  ad_low_noise_float_2023 - : Get value: timeout_detected: Operation added, # of ops in queue: 5
+18:42:58,544:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Operation added, # of ops in queue: 6
+18:42:58,544:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Operation added, # of ops in queue: 7
+18:42:58,545:  ad_low_noise_float_2023 - : Get value: enable_start_s: Operation added, # of ops in queue: 8
+18:42:58,545:  ad_low_noise_float_2023 - : Get value: enable_s: Operation added, # of ops in queue: 9
+18:42:58,545:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver started
+18:42:58,545:  performGetValue('IN_disable') FIRST
+18:43:01,538:  CAPTURING append(1350) idx0_start_capturing=7308 of 8658
+18:43:01,538:  enable_start_detected: idx0=0 self._sps=3052 self.enable_start_s=0.000s
+18:43:10,641:  CAPTURING append(30000)
+18:43:10,642:  enable_end_detected: idx0=34 self._sps=3052 self.enable_s=0.011s
+18:43:10,642:      35samples
+18:43:10,642:      3052SPS
+18:43:10,642:      timeout_detected=False
+18:43:10,642:      enable_start_detected=True enable_start_s=0.000s
+18:43:10,642:      enable_end_detected=True enable_s=0.011s
+18:43:10,643:  performGetValue('IN_disable') returned 12.09s
+18:43:10,643:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver finished in 12098 ms, # of ops in queue: 8
+18:43:10,643:  ad_low_noise_float_2023 - : Get value: IN_t: Driver started
+18:43:10,643:  performGetValue('IN_t') 
+18:43:10,644:  performGetValue('IN_t') returned 0.00s
+18:43:10,644:  ad_low_noise_float_2023 - : Get value: IN_t: Driver finished in 0 ms, # of ops in queue: 7
+18:43:10,644:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver started
+18:43:10,644:  performGetValue('IN_voltage') 
+18:43:10,644:  performGetValue('IN_voltage') returned 0.00s
+18:43:10,644:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver finished in 0 ms, # of ops in queue: 6
+18:43:10,644:  ad_low_noise_float_2023 - : Get value: Input range: Driver started
+18:43:10,645:  performGetValue('Input range') 
+18:43:10,645:  performGetValue('Input range') returned 0.00s
+18:43:10,645:  ad_low_noise_float_2023 - : Get value: Input range: Driver finished in 0 ms, # of ops in queue: 5
+18:43:10,645:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver started
+18:43:10,645:  performGetValue('timeout_detected') 
+18:43:10,645:  performGetValue('timeout_detected') returned 0.00s
+18:43:10,645:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver finished in 0 ms, # of ops in queue: 4
+18:43:10,646:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver started
+18:43:10,646:  performGetValue('enable_start_detected') 
+18:43:10,646:  performGetValue('enable_start_detected') returned 0.00s
+18:43:10,646:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver finished in 0 ms, # of ops in queue: 3
+18:43:10,646:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver started
+18:43:10,646:  performGetValue('enable_end_detected') 
+18:43:10,646:  performGetValue('enable_end_detected') returned 0.00s
+18:43:10,648:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver finished in 0 ms, # of ops in queue: 2
+18:43:10,648:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver started
+18:43:10,648:  performGetValue('enable_start_s') 
+18:43:10,648:  performGetValue('enable_start_s') returned 0.00s
+18:43:10,648:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver finished in 0 ms, # of ops in queue: 1
+18:43:10,648:  ad_low_noise_float_2023 - : Get value: enable_s: Driver started
+18:43:10,648:  performGetValue('enable_s') 
+18:43:10,648:  performGetValue('enable_s') returned 0.00s
+18:43:10,649:  ad_low_noise_float_2023 - : Get value: enable_s: Driver finished in 0 ms, # of ops in queue: 0
+18:43:10,657:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 3 idx: Operation added, # of ops in queue: 1
+18:43:10,657:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 3 idx: Driver started
+18:43:10,657:  performSetValue('Scenario', 3.0)
+18:43:10,657:  run_scenario(scenario=3, run_synchron=False, do_validate=False): scenario_03_prepare_disable.py
+18:43:10,657:  micropython execfile: scenario_03_prepare_disable.py
+18:43:10,662:  micropython execfile: scenario_03_prepare_disable.py returned b''
+18:43:10,666:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:43:10,670:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:43:10,670:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:43:10,674:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:43:10,674:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 3 idx: Driver finished in 17 ms, # of ops in queue: 0
+18:43:10,688:  ad_low_noise_float_2023 - : Get value: IN_disable: Operation added, # of ops in queue: 1
+18:43:10,689:  ad_low_noise_float_2023 - : Get value: IN_t: Operation added, # of ops in queue: 2
+18:43:10,689:  ad_low_noise_float_2023 - : Get value: IN_voltage: Operation added, # of ops in queue: 3
+18:43:10,689:  ad_low_noise_float_2023 - : Get value: Input range: Operation added, # of ops in queue: 4
+18:43:10,689:  ad_low_noise_float_2023 - : Get value: timeout_detected: Operation added, # of ops in queue: 5
+18:43:10,689:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Operation added, # of ops in queue: 6
+18:43:10,689:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Operation added, # of ops in queue: 7
+18:43:10,690:  ad_low_noise_float_2023 - : Get value: enable_start_s: Operation added, # of ops in queue: 8
+18:43:10,690:  ad_low_noise_float_2023 - : Get value: enable_s: Operation added, # of ops in queue: 9
+18:43:10,690:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver started
+18:43:10,690:  performGetValue('IN_disable') FIRST
+18:43:20,764:  CAPTURING append(27453) idx0_start_capturing=2547 of 30000
+18:43:20,764:  TIMEOUT 27453(15260)samples 5.000s 3052SPS
+18:43:20,764:      27453samples
+18:43:20,764:      3052SPS
+18:43:20,764:      timeout_detected=True
+18:43:20,765:      enable_start_detected=False enable_start_s=0.000s
+18:43:20,765:      enable_end_detected=False enable_s=0.000s
+18:43:20,765:  performGetValue('IN_disable') returned 10.08s
+18:43:20,765:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver finished in 10075 ms, # of ops in queue: 8
+18:43:20,765:  ad_low_noise_float_2023 - : Get value: IN_t: Driver started
+18:43:20,765:  performGetValue('IN_t') 
+18:43:20,765:  performGetValue('IN_t') returned 0.00s
+18:43:20,765:  ad_low_noise_float_2023 - : Get value: IN_t: Driver finished in 0 ms, # of ops in queue: 7
+18:43:20,765:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver started
+18:43:20,767:  performGetValue('IN_voltage') 
+18:43:20,767:  performGetValue('IN_voltage') returned 0.00s
+18:43:20,767:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver finished in 1 ms, # of ops in queue: 6
+18:43:20,767:  ad_low_noise_float_2023 - : Get value: Input range: Driver started
+18:43:20,767:  performGetValue('Input range') 
+18:43:20,768:  performGetValue('Input range') returned 0.00s
+18:43:20,768:  ad_low_noise_float_2023 - : Get value: Input range: Driver finished in 0 ms, # of ops in queue: 5
+18:43:20,768:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver started
+18:43:20,768:  performGetValue('timeout_detected') 
+18:43:20,768:  performGetValue('timeout_detected') returned 0.00s
+18:43:20,768:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver finished in 0 ms, # of ops in queue: 4
+18:43:20,768:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver started
+18:43:20,768:  performGetValue('enable_start_detected') 
+18:43:20,769:  performGetValue('enable_start_detected') returned 0.00s
+18:43:20,769:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver finished in 0 ms, # of ops in queue: 3
+18:43:20,769:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver started
+18:43:20,769:  performGetValue('enable_end_detected') 
+18:43:20,769:  performGetValue('enable_end_detected') returned 0.00s
+18:43:20,769:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver finished in 0 ms, # of ops in queue: 2
+18:43:20,769:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver started
+18:43:20,769:  performGetValue('enable_start_s') 
+18:43:20,769:  performGetValue('enable_start_s') returned 0.00s
+18:43:20,770:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver finished in 0 ms, # of ops in queue: 1
+18:43:20,770:  ad_low_noise_float_2023 - : Get value: enable_s: Driver started
+18:43:20,770:  performGetValue('enable_s') 
+18:43:20,770:  performGetValue('enable_s') returned 0.00s
+18:43:20,770:  ad_low_noise_float_2023 - : Get value: enable_s: Driver finished in 0 ms, # of ops in queue: 0
+18:43:20,784:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 4 idx: Operation added, # of ops in queue: 1
+18:43:20,784:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 4 idx: Driver started
+18:43:20,785:  performSetValue('Scenario', 4.0)
+18:43:20,785:  run_scenario(scenario=4, run_synchron=False, do_validate=False): scenario_04_test_enable_disable.py
+18:43:20,785:  micropython execfile: scenario_04_test_enable_disable.py
+18:43:20,800:  micropython execfile: scenario_04_test_enable_disable.py returned b''
+18:43:20,803:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:43:20,808:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:43:20,808:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:43:20,813:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:43:20,813:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 4 idx: Driver finished in 28 ms, # of ops in queue: 0
+18:43:20,828:  ad_low_noise_float_2023 - : Get value: IN_disable: Operation added, # of ops in queue: 1
+18:43:20,828:  ad_low_noise_float_2023 - : Get value: IN_t: Operation added, # of ops in queue: 2
+18:43:20,829:  ad_low_noise_float_2023 - : Get value: IN_voltage: Operation added, # of ops in queue: 3
+18:43:20,829:  ad_low_noise_float_2023 - : Get value: Input range: Operation added, # of ops in queue: 4
+18:43:20,829:  ad_low_noise_float_2023 - : Get value: timeout_detected: Operation added, # of ops in queue: 5
+18:43:20,829:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Operation added, # of ops in queue: 6
+18:43:20,829:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Operation added, # of ops in queue: 7
+18:43:20,829:  ad_low_noise_float_2023 - : Get value: enable_start_s: Operation added, # of ops in queue: 8
+18:43:20,830:  ad_low_noise_float_2023 - : Get value: enable_s: Operation added, # of ops in queue: 9
+18:43:20,830:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver started
+18:43:20,830:  performGetValue('IN_disable') FIRST
+18:43:21,775:  CAPTURING append(0) idx0_start_capturing=5232 of 2210
+18:43:21,776:  CAPTURING append(1529)
+18:43:21,777:  enable_start_detected: idx0=33 self._sps=3052 self.enable_start_s=0.011s
+18:43:28,017:  ad_low_noise_float_2023_stimuli - : Abort operation: Operation added, # of ops in queue: 1
+18:43:28,017:  ad_low_noise_float_2023_stimuli - : Abort operation: Driver started
+18:43:28,018:  ad_low_noise_float_2023_stimuli - : Abort operation: Driver finished in 0 ms, # of ops in queue: 0
+18:43:31,875:  CAPTURING append(30000)
+18:43:31,875:  enable_end_detected: idx0=1530 self._sps=3052 self.enable_s=0.501s
+18:43:31,875:      1531samples
+18:43:31,876:      3052SPS
+18:43:31,876:      timeout_detected=False
+18:43:31,876:      enable_start_detected=True enable_start_s=0.011s
+18:43:31,876:      enable_end_detected=True enable_s=0.501s
+18:43:31,877:  performGetValue('IN_disable') returned 11.05s
+18:43:31,877:  ad_low_noise_float_2023 - : Get value: IN_disable: Driver finished in 11047 ms, # of ops in queue: 8
+18:43:31,877:  ad_low_noise_float_2023 - : Get value: IN_t: Driver started
+18:43:31,877:  ad_low_noise_float_2023 - : Abort operation: Operation added, # of ops in queue: 8
+18:43:31,877:  ad_low_noise_float_2023 - : Get value: IN_t: Driver aborted, # of ops in queue: 8
+18:43:31,878:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver started
+18:43:31,878:  ad_low_noise_float_2023 - : Get value: IN_voltage: Driver aborted, # of ops in queue: 7
+18:43:31,878:  ad_low_noise_float_2023 - : Get value: Input range: Driver started
+18:43:31,878:  ad_low_noise_float_2023 - : Get value: Input range: Driver aborted, # of ops in queue: 6
+18:43:31,878:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver started
+18:43:31,879:  ad_low_noise_float_2023 - : Get value: timeout_detected: Driver aborted, # of ops in queue: 5
+18:43:31,879:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver started
+18:43:31,879:  ad_low_noise_float_2023 - : Get value: enable_start_detected: Driver aborted, # of ops in queue: 4
+18:43:31,879:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver started
+18:43:31,879:  ad_low_noise_float_2023 - : Get value: enable_end_detected: Driver aborted, # of ops in queue: 3
+18:43:31,879:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver started
+18:43:31,880:  ad_low_noise_float_2023 - : Get value: enable_start_s: Driver aborted, # of ops in queue: 2
+18:43:31,880:  ad_low_noise_float_2023 - : Get value: enable_s: Driver started
+18:43:31,880:  ad_low_noise_float_2023 - : Get value: enable_s: Driver aborted, # of ops in queue: 1
+18:43:31,880:  ad_low_noise_float_2023 - : Abort operation: Driver started
+18:43:31,880:  ad_low_noise_float_2023 - : Abort operation: Driver finished in 0 ms, # of ops in queue: 0
+18:43:35,536:  ad_low_noise_float_2023 - : Get value: Logging Driver: Operation added, # of ops in queue: 1
+18:43:35,536:  ad_low_noise_float_2023 - : Get value: Logging Driver: Driver started
+18:43:35,536:  performGetValue('Logging Driver') FIRST
+18:43:41,990:  CAPTURING append(0) idx0_start_capturing=33441 of 30000
+18:43:51,066:  CAPTURING append(30000)
+18:43:51,066:  TIMEOUT 30000(15260)samples 5.000s 3052SPS
+18:43:51,066:      30000samples
+18:43:51,067:      3052SPS
+18:43:51,067:      timeout_detected=True
+18:43:51,067:      enable_start_detected=False enable_start_s=0.000s
+18:43:51,067:      enable_end_detected=False enable_s=0.000s
+18:43:51,067:  performGetValue('Logging Driver') returned 15.51s
+18:43:51,067:  ad_low_noise_float_2023 - : Get value: Logging Driver: Driver finished in 15531 ms, # of ops in queue: 0
+18:43:51,067:  ad_low_noise_float_2023 - : Set value: Logging Driver = WARNING: Operation added, # of ops in queue: 1
+18:43:51,067:  ad_low_noise_float_2023 - : Set value: Logging Driver = WARNING: Driver started
+18:44:16,234:  ad_low_noise_float_2023_stimuli - : Set config: Operation added, # of ops in queue: 1
+18:44:16,234:  ad_low_noise_float_2023_stimuli - : Set config: Driver started
+18:44:16,235:  performSetValue('Logging', DEBUG)
+18:44:16,235:  Logging severity not implemented yet
+18:44:16,235:  performSetValue('Synchron', ASYNCHRON)
+18:44:16,235:  performSetValue('Scenario', 0.0)
+18:44:16,235:  run_scenario(scenario=0, run_synchron=False, do_validate=False): scenario_00_prepare_enable.py
+18:44:16,235:  micropython execfile: scenario_00_prepare_enable.py
+18:44:16,239:  micropython execfile: scenario_00_prepare_enable.py returned b''
+18:44:16,243:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:44:16,247:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:44:16,247:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:44:16,257:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:44:16,257:  ad_low_noise_float_2023_stimuli - : Set config: Driver finished in 23 ms, # of ops in queue: 0
+18:44:16,299:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Operation added, # of ops in queue: 1
+18:44:16,299:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Driver started
+18:44:16,299:  performSetValue('Scenario', 0.0)
+18:44:16,300:  run_scenario(scenario=0, run_synchron=False, do_validate=False): scenario_00_prepare_enable.py
+18:44:16,300:  micropython execfile: scenario_00_prepare_enable.py
+18:44:16,305:  micropython execfile: scenario_00_prepare_enable.py returned b''
+18:44:16,308:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:44:16,312:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:44:16,312:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:44:16,316:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:44:16,316:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Driver finished in 17 ms, # of ops in queue: 0
+18:44:36,546:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 1 idx: Operation added, # of ops in queue: 1
+18:44:36,546:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 1 idx: Driver started
+18:44:36,546:  performSetValue('Scenario', 1.0)
+18:44:36,547:  run_scenario(scenario=1, run_synchron=False, do_validate=False): scenario_01_test_timeout.py
+18:44:36,547:  micropython execfile: scenario_01_test_timeout.py
+18:44:36,551:  micropython execfile: scenario_01_test_timeout.py returned b''
+18:44:36,555:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:44:36,558:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:44:36,558:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:44:36,564:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:44:36,564:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 1 idx: Driver finished in 18 ms, # of ops in queue: 0
+18:44:55,712:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 2 idx: Operation added, # of ops in queue: 1
+18:44:55,713:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 2 idx: Driver started
+18:44:55,713:  performSetValue('Scenario', 2.0)
+18:44:55,713:  run_scenario(scenario=2, run_synchron=False, do_validate=False): scenario_02_test_enable_end_detected.py
+18:44:55,713:  micropython execfile: scenario_02_test_enable_end_detected.py
+18:44:55,719:  micropython execfile: scenario_02_test_enable_end_detected.py returned b''
+18:44:55,722:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:44:55,726:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:44:55,726:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:44:55,731:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:44:55,731:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 2 idx: Driver finished in 19 ms, # of ops in queue: 0
+18:45:07,835:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 3 idx: Operation added, # of ops in queue: 1
+18:45:07,835:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 3 idx: Driver started
+18:45:07,835:  performSetValue('Scenario', 3.0)
+18:45:07,836:  run_scenario(scenario=3, run_synchron=False, do_validate=False): scenario_03_prepare_disable.py
+18:45:07,836:  micropython execfile: scenario_03_prepare_disable.py
+18:45:07,840:  micropython execfile: scenario_03_prepare_disable.py returned b''
+18:45:07,843:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:45:07,847:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:45:07,847:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:45:07,852:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:45:07,853:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 3 idx: Driver finished in 17 ms, # of ops in queue: 0
+18:45:17,941:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 4 idx: Operation added, # of ops in queue: 1
+18:45:17,942:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 4 idx: Driver started
+18:45:17,942:  performSetValue('Scenario', 4.0)
+18:45:17,942:  run_scenario(scenario=4, run_synchron=False, do_validate=False): scenario_04_test_enable_disable.py
+18:45:17,942:  micropython execfile: scenario_04_test_enable_disable.py
+18:45:17,956:  micropython execfile: scenario_04_test_enable_disable.py returned b''
+18:45:17,960:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:45:17,964:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:45:17,965:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:45:17,970:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:45:17,970:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 4 idx: Driver finished in 28 ms, # of ops in queue: 0
+18:45:29,071:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 5 idx: Operation added, # of ops in queue: 1
+18:45:29,071:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 5 idx: Driver started
+18:45:29,071:  performSetValue('Scenario', 5.0)
+18:45:29,071:  run_scenario(scenario=5, run_synchron=False, do_validate=False): scenario_05_test_enable_disable.py
+18:45:29,071:  micropython execfile: scenario_05_test_enable_disable.py
+18:45:29,086:  micropython execfile: scenario_05_test_enable_disable.py returned b''
+18:45:29,090:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:45:29,095:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:45:29,095:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:45:29,101:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:45:29,101:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 5 idx: Driver finished in 30 ms, # of ops in queue: 0
+18:45:43,218:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 6 idx: Operation added, # of ops in queue: 1
+18:45:43,218:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 6 idx: Driver started
+18:45:43,218:  performSetValue('Scenario', 6.0)
+18:45:43,218:  run_scenario(scenario=6, run_synchron=False, do_validate=False): scenario_06_test_delay_trigger_vs_signal.py
+18:45:43,218:  micropython execfile: scenario_06_test_delay_trigger_vs_signal.py
+18:45:43,231:  micropython execfile: scenario_06_test_delay_trigger_vs_signal.py returned b''
+18:45:43,233:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:45:43,238:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:45:43,238:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:45:43,243:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:45:43,243:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 6 idx: Driver finished in 25 ms, # of ops in queue: 0
+18:45:54,335:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Operation added, # of ops in queue: 1
+18:45:54,335:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Driver started
+18:45:54,335:  performSetValue('Scenario', 0.0)
+18:45:54,336:  run_scenario(scenario=0, run_synchron=False, do_validate=False): scenario_00_prepare_enable.py
+18:45:54,336:  micropython execfile: scenario_00_prepare_enable.py
+18:45:54,340:  micropython execfile: scenario_00_prepare_enable.py returned b''
+18:45:54,344:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)')
+18:45:54,349:  micropython _exec_raw('run_scenario(run_synchron=True, do_validate=True)') returned: data=b'', data_err=b''
+18:45:54,349:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)')
+18:45:54,353:  micropython _exec_raw('run_scenario(run_synchron=False, do_validate=False)') returned: data=b'', data_err=b''
+18:45:54,354:  ad_low_noise_float_2023_stimuli - : Set value: Scenario = 0 idx: Driver finished in 18 ms, # of ops in queue: 0
