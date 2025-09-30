@@ -312,7 +312,7 @@ class AdThread(threading.Thread):
         """
         while True:
             pcb_params = PcbParams(
-                input_Vp=1.0, register_filter1=self.register_filter1, resolution22=True
+                scale_factor=1.0, register_filter1=self.register_filter1, resolution22=True
             )
             if TODO_REMOVE:
                 logger.info(
