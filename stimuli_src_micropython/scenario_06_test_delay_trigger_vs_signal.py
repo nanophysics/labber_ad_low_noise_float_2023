@@ -23,7 +23,7 @@ def scenario(ctx):
 
     ctx.wait_ms(2)
 
-    ctx.IN_P_0V7_t_toggle()
+    ctx.IN_P_0V7_t_up_down()
 
     ctx.wait_ms(2)
 

@@ -329,7 +329,7 @@ class AdThread(threading.Thread):
             logger.info("connect(): Done reconnect to update SPS.")
             self._aquisition.set_SPS(pcb_params.register_filter1)
             settings_program = self.ad.pcb_status.settings["PROGRAM"]
-            REQUIRED_VERSION = "ad_low_noise_float_2023(0.3.10)"
+            REQUIRED_VERSION = "ad_low_noise_float_2023(0.3.11)"
             if (settings_program < REQUIRED_VERSION) or (
                 len(settings_program) < len(REQUIRED_VERSION)
             ):
