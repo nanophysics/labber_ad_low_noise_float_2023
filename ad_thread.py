@@ -312,7 +312,9 @@ class AdThread(threading.Thread):
         """
         while True:
             pcb_params = PcbParams(
-                scale_factor=1.0, register_filter1=self.register_filter1, resolution22=True
+                scale_factor=1.0,
+                register_filter1=self.register_filter1,
+                resolution22=True,
             )
             if TODO_REMOVE:
                 logger.info(
@@ -328,14 +330,6 @@ class AdThread(threading.Thread):
             self.ad.connect(pcb_params=pcb_params)
             logger.info("connect(): Done reconnect to update SPS.")
             self._aquisition.set_SPS(pcb_params.register_filter1)
-            settings_program = self.ad.pcb_status.settings["PROGRAM"]
-            REQUIRED_VERSION = "ad_low_noise_float_2023(0.3.11)"
-            if (settings_program < REQUIRED_VERSION) or (
-                len(settings_program) < len(REQUIRED_VERSION)
-            ):
-                raise ValueError(
-                    f"Found '{settings_program}' but required at least '{REQUIRED_VERSION}'!"
-                )
 
             for measurements in self.ad.iter_measurements_V(
                 pcb_params=pcb_params, do_connect=False
@@ -429,7 +423,9 @@ class AdThread(threading.Thread):
         """
         if TODO_REMOVE:
             logger.info("TODO REMOVE wait_measurements() ENTER")
-        self._aquisition.wait_for_acquisition(idx0_start_capturing=self.ad.decoder.size())
+        self._aquisition.wait_for_acquisition(
+            idx0_start_capturing=self.ad.decoder.size()
+        )
         if TODO_REMOVE:
             logger.info("TODO REMOVE wait_measurements() LEAVE")
 
