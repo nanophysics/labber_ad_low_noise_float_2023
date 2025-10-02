@@ -8,10 +8,12 @@ import logging
 
 import InstrumentDriver
 
+from ad_low_noise_float_2023.ad import LOGGER_NAME
+
 import stimuli_utils
 import logging_utils
 
-logger = logging.getLogger("LabberDriver")
+logger = logging.getLogger(LOGGER_NAME)
 
 logging.basicConfig()
 logger.setLevel(logging.DEBUG)

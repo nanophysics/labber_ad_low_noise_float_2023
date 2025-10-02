@@ -3,7 +3,9 @@ import time
 import pathlib
 import logging
 
-logger = logging.getLogger("LabberDriver")
+from ad_low_noise_float_2023.ad import LOGGER_NAME
+
+logger = logging.getLogger(LOGGER_NAME)
 
 DIRECTORY_OF_THIS_FILE = pathlib.Path(__file__).absolute().parent
 

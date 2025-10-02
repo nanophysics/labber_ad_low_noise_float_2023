@@ -13,7 +13,7 @@ from ad_low_noise_float_2023.ad import (
     LOGGER_NAME,
     MeasurementSequence,
 )
-from ad_low_noise_float_2023.constants import PcbParams, RegisterFilter1
+from ad_low_noise_float_2023.constants import PcbParams, RegisterFilter1, AD_FS_V
 from ad_utils import CHANNEL_VOLTAGE, CHANNEL_T, CHANNEL_DISABLE
 
 ADD_PRE_POST_SAMPLE = True
@@ -24,8 +24,7 @@ If not set, IN_disable looks very boring... (all samples are 0)
 
 TODO_REMOVE = False
 
-logger = logging.getLogger("LabberDriver")
-logger_ad = logging.getLogger(LOGGER_NAME)
+logger = logging.getLogger(LOGGER_NAME)
 
 LOCK = threading.Lock()
 
@@ -461,7 +460,7 @@ class AdThread(threading.Thread):
     @synchronized
     def get_quantity_sync(self, quant):
         if quant.name == "Input range":
-            return self.ad.pcb_status.gain_from_jumpers
+            return AD_FS_V / self.ad.pcb_status.gain_from_jumpers
 
         if quant.name == "sample_rate_SPS":
             return self.register_filter1.name
@@ -490,7 +489,8 @@ class AdThread(threading.Thread):
 def main_standalone():
     logging.basicConfig()
     logger.setLevel(logging.DEBUG)
-    logger_ad.setLevel(logging.DEBUG)
+    logger_labber = logging.getLogger("LabberDriver")
+    logger_labber.setLevel(logging.DEBUG)
 
     thread = AdThread()
     if False:

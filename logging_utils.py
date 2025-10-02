@@ -2,8 +2,7 @@ import logging
 import enum
 from ad_low_noise_float_2023.ad import LOGGER_NAME
 
-logger = logging.getLogger("LabberDriver")
-logger_ad = logging.getLogger(LOGGER_NAME)
+logger = logging.getLogger(LOGGER_NAME)
 
 
 class EnumMixin:
@@ -44,14 +43,15 @@ def performSetValue(quant, value):
     logging.debug(f"value={repr(value)}")
     if quant.name == "Logging Driver":
         # logging_text = quant.getValueString()
+        logger_labber = logging.getLogger("LabberDriver")
         logging_level = EnumLogging.get_exception(value)
-        logger.setLevel(logging_level.getLoggingLevel())
+        logger_labber.setLevel(logging_level.getLoggingLevel())
         return value
 
     if quant.name == "Logging AD":
         # logging_text = quant.getValueString()
         logging_level = EnumLogging.get_exception(value)
-        logger_ad.setLevel(logging_level.getLoggingLevel())
+        logger.setLevel(logging_level.getLoggingLevel())
         return value
 
     return None

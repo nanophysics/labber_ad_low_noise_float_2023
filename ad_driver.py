@@ -12,12 +12,12 @@ import ad_utils
 import ad_thread
 import logging_utils
 
-logger = logging.getLogger("LabberDriver")
-logger_ad = logging.getLogger(LOGGER_NAME)
+logger = logging.getLogger(LOGGER_NAME)
 
 logging.basicConfig()
+logger_labber = logging.getLogger("LabberDriver")
+logger_labber.setLevel(logging.DEBUG)
 logger.setLevel(logging.DEBUG)
-logger_ad.setLevel(logging.DEBUG)
 
 print(sys.version_info)
 
