@@ -34,8 +34,8 @@ except ModuleNotFoundError:
         'The module "mpfshell2" is missing. Did you call "pip -r requirements_stimuli.txt"?'
     )
 
-REQUIRED_MPFSHELL_VERSION = "100.9.17"
-if mp.version.FULL > REQUIRED_MPFSHELL_VERSION:
+REQUIRED_MPFSHELL_VERSION = "100.9.24"
+if mp.version.FULL < REQUIRED_MPFSHELL_VERSION:
     raise Exception(
         f'Your "mpfshell" has version "{mp.version.FULL}" but should be higher than "{REQUIRED_MPFSHELL_VERSION}". Call "pip install --upgrade mpfshell2"!'
     )
