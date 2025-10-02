@@ -256,6 +256,8 @@ class Acquistion:
         )
         if self.timeout_detected:
             self.capturer.IN_disable[0] = self._IN_disable_first_measurement
+            self.capturer.limit_end(self._duration_max_sample)
+            self.enable_s = self._duration_max_sample / self._sps
             logger.info(
                 f"TIMEOUT {len(self.capturer.IN_disable)}({self._duration_max_sample})samples {self.duration_max_s:0.3f}s {self._sps}SPS"
             )
