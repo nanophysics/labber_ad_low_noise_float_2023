@@ -1,6 +1,6 @@
 """
-Based on
-C:\Program Files\Labber\Drivers\Examples\SimpleSignalGenerator
+This is a driver for
+<this_repo>/testsetup_labber
 """
 
 import sys

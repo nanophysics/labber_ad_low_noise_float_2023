@@ -15,5 +15,5 @@ $ ~/AppData/Local/Programs/Python/Python37/python.exe --version
 Python 3.7.9
 
 $ ~/AppData/Local/Programs/Python/Python37/python.exe -m pip list
-mpfshell2                100.9.24
+mpfshell2                100.9.25
 ```
